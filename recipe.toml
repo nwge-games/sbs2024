@@ -12,7 +12,12 @@ hide-symbols = true
 std = "c++23"
 hide-symbols = true
 
-[game]
-exe = "game"
+[data]
+plug = "bndl"
+src = "source/data"
+out = "target/sbs.bndl"
+
+[sbs]
+exe = "sbs"
 lang = "cpp"
 libs = [ "nwge", "SDL2" ]
