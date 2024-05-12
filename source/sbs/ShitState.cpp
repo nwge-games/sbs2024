@@ -179,8 +179,8 @@ public:
       .nqFont("inter.cfn", mFont)
       .nqTexture("water.png", mWaterTexture)
       .nqTexture("bg.png", mBgTexture);
-    mStore
-      .nqLoadIfExists("progress", [this](auto &file){
+    mStore.nqLoad("progress",
+      [this](auto &file){
         if(!file.read(mScore)) {
           return false;
         }
