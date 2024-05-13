@@ -70,25 +70,25 @@ private:
 
   f32 mProgress = 0.0f;
 
+  static constexpr f32 cProgressScalar = 0.5f;
+
   f32 mCooldown = 0.0f;
 
   static constexpr f32
     cCooldownValue = 5.0f;
 
-  static constexpr f32
-    cProgressScalar = 0.5f,
-    cBaseProgressDecay = 0.095f,
-    cLubeUpgrade = 0.01f;
+  s16 mLubeTier = 0;
+  s16 mGravityTier = 0;
 
-  s32 mLubeTier = 0;
-
-  static constexpr s32
-    cMaxLubeTier = 2;
-
-  f32 mProgressDecay = cBaseProgressDecay;
+  f32 mGravity = 0.0f;
+  f32 mProgressDecay = 0.9f;
 
   void recalculateProgressDecay() {
-    mProgressDecay = cBaseProgressDecay - f32(mLubeTier) * cLubeUpgrade;
+    mProgressDecay = mConfig.lube.base - f32(mLubeTier) * mConfig.lube.upgrade;
+  }
+
+  void recalculateGravity() {
+    mGravity = mConfig.gravity.base + f32(mGravityTier) * mConfig.gravity.upgrade;
   }
 
   render::gl::Texture mBrickTexture;
@@ -100,7 +100,6 @@ private:
     cBrickBeginY = 0.5f,
     cBrickPushEndY = 0.6f,
     cBrickFallEndY = 1.0f,
-    cBrickFallSpeed = 1.0f,
     cBrickW = 0.04f,
     cBrickH = 0.08f,
     cBrickZ = 0.55f;
@@ -132,9 +131,11 @@ private:
 
   f32 mTimer = 0.0f;
 
-  render::gl::Texture mBgTexture;
+  render::gl::Texture mBgTexture, mVignetteTexture;
 
-  static constexpr f32 cBgZ = 0.6f;
+  static constexpr f32
+    cBgZ = 0.6f,
+    cVignetteZ = 0.3f;
 
   data::Store mStore;
 
@@ -146,7 +147,7 @@ private:
       if(!file.write(mLubeTier)) {
         return false;
       }
-      return true;
+      return file.write(mGravityTier);
     });
   }
 
@@ -170,21 +171,28 @@ private:
       (mousePos.y > cStoreIconY && mousePos.y < cStoreIconY+cStoreIconH);
   }
 
+  Config mConfig;
+
 public:
   bool preload() override {
     mBundle
-      .load("sbs.bndl")
+      .load({"sbs.bndl"})
       .nqTexture("bars.png", mBarsTexture)
       .nqTexture("brick.png", mBrickTexture)
       .nqFont("inter.cfn", mFont)
       .nqTexture("water.png", mWaterTexture)
-      .nqTexture("bg.png", mBgTexture);
+      .nqTexture("bg.png", mBgTexture)
+      .nqCustom("cfg.json", mConfig)
+      .nqTexture("vignette.png", mVignetteTexture);
     mStore.nqLoad("progress",
       [this](auto &file){
         if(!file.read(mScore)) {
           return false;
         }
         if(!file.read(mLubeTier)) {
+          return false;
+        }
+        if(!file.read(mGravityTier)) {
           return false;
         }
         return true;
@@ -194,6 +202,7 @@ public:
 
   bool init() override {
     recalculateProgressDecay();
+    recalculateGravity();
     refreshScoreString();
     return true;
   }
@@ -205,6 +214,8 @@ public:
         StoreData data{
           mScore,
           mLubeTier,
+          mGravityTier,
+          mConfig,
           mFont,
           mIconsTexture,
         };
@@ -255,6 +266,9 @@ public:
 
     if(mProgress < 1) {
       mProgress += mEffort * cProgressScalar * delta;
+      // if(mProgress >= mConfig.gravity.threshold) {
+      //   mProgress += mGravity * delta;
+      // }
       if(mProgress >= 1) {
         mCooldown = cCooldownValue;
         mBrickFall = 0.0f;
@@ -274,10 +288,11 @@ public:
       mCooldown = 0;
       mBrickFall = -1.0f;
       recalculateProgressDecay();
+      recalculateGravity();
     }
 
     if(mBrickFall >= 0) {
-      mBrickFall += cBrickFallSpeed * delta;
+      mBrickFall += mConfig.brickFallSpeed * delta;
     }
 
     mBoilTimer += delta;
@@ -345,6 +360,9 @@ public:
       {cStoreIconX, cStoreIconY, cStoreIconZ},
       {cStoreIconW, cStoreIconH},
       mIconsTexture);
+
+    render::color({1, 1, 1, mEffort});
+    render::rect({0, 0, cVignetteZ}, {1, 1}, mVignetteTexture);
   }
 };
 

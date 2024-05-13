@@ -33,7 +33,7 @@ private:
 public:
   bool preload() override {
     mBundle
-      .load("sbs.bndl")
+      .load({"sbs.bndl"})
       .nqTexture("logo1.png", mLogo);
     return true;
   }

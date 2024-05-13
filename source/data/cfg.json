@@ -1,0 +1,46 @@
+{
+  "lube": {
+    "base": 0.95,
+    "upgrade": 0.01,
+    "maxTier": 2
+  },
+  "gravity": {
+    "base": 0.001,
+    "upgrade": 0.05,
+    "threshold": 0.75,
+    "maxTier": 2
+  },
+  "brickFallSpeed": 1.5,
+  "store": [
+    {
+      "name": "Chinese Lube",
+      "desc": "Obtained from an 8-legged chinese man.",
+      "price": 10,
+      "lubeTier": 1
+    },
+    {
+      "name": "Super Lube",
+      "desc": "Industrial-grade poop chute sloppifier.",
+      "price": 25,
+      "lubeTier": 2
+    },
+    {
+      "name": "Gravity Intensifier",
+      "desc": "Weird device that pulls things towards it.",
+      "price": 35,
+      "gravityTier": 1
+    },
+    {
+      "name": "Mini Black Hole",
+      "desc": "Pulls shit out really well.",
+      "price": 50,
+      "gravityTier": 2
+    },
+    {
+      "name": "Supermassive Black Hole",
+      "desc": "It sucks.",
+      "price": 100,
+      "endGame": true
+    }
+  ]
+}

@@ -171,7 +171,7 @@ private:
 public:
   bool preload() override {
     mBundle
-      .load("sbs.bndl")
+      .load({"sbs.bndl"})
       .nqTexture("logo2.png", mLogo)
       .nqTexture("brick.png", mBrickTexture)
       .nqFont("inter.cfn", mFont);
