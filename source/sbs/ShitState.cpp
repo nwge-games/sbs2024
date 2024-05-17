@@ -135,7 +135,7 @@ private:
 
   static constexpr f32
     cBgZ = 0.6f,
-    cVignetteZ = 0.3f;
+    cVignetteZ = 0.41f;
 
   data::Store mStore;
 
@@ -266,9 +266,9 @@ public:
 
     if(mProgress < 1) {
       mProgress += mEffort * cProgressScalar * delta;
-      // if(mProgress >= mConfig.gravity.threshold) {
-      //   mProgress += mGravity * delta;
-      // }
+      if(mProgress >= mConfig.gravity.threshold) {
+        mProgress += mGravity * delta;
+      }
       if(mProgress >= 1) {
         mCooldown = cCooldownValue;
         mBrickFall = 0.0f;
@@ -361,7 +361,8 @@ public:
       {cStoreIconW, cStoreIconH},
       mIconsTexture);
 
-    render::color({1, 1, 1, mEffort});
+    f32 vignetteAlpha = fmaxf(mEffort, 1.0f - mOxy);
+    render::color({1, 1, 1, vignetteAlpha});
     render::rect({0, 0, cVignetteZ}, {1, 1}, mVignetteTexture);
   }
 };
