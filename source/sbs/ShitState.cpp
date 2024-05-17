@@ -105,7 +105,7 @@ private:
   static constexpr f32
     cTextH = 0.05f,
     cTextX = 0.5f,
-    cTextY = 0.9f,
+    cTextY = 0.075f,
     cTextZ = 0.53f;
 
   render::Font mFont;
@@ -154,8 +154,8 @@ private:
   static constexpr f32
     cStoreIconW = 0.05f,
     cStoreIconH = 0.05f,
-    cStoreIconX = 0.9f - cStoreIconW,
-    cStoreIconY = 0.9f - cStoreIconH,
+    cStoreIconX = cTextX + 0.2f,
+    cStoreIconY = cTextY,
     cStoreIconZ = 0.52f;
 
   static constexpr glm::vec3
@@ -334,8 +334,7 @@ public:
     render::color();
     auto measure = mFont.measure(mScoreString, cTextH);
     f32 textX = cTextX - measure.x / 2;
-    f32 textY = cTextY - measure.y / 2;
-    mFont.draw(mScoreString, {textX, textY, cTextZ}, cTextH);
+    mFont.draw(mScoreString, {textX, cTextY, cTextZ}, cTextH);
 
     if(mHoveringStoreIcon) {
       render::color(cHoverColor);

@@ -23,7 +23,7 @@ private:
     cWindowBgZ = 0.39f;
 
   static constexpr f32
-    cPad = 0.05f,
+    cPad = 0.01f,
     cTitleTextY = cWindowY + cPad,
     cTitleTextH = 0.08f,
     cTitleTextZ = 0.38f;

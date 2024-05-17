@@ -144,7 +144,20 @@ private:
     cTextH = 0.1f,
     cTextX = 0.5f,
     cTextY = 0.5f,
-    cTextZ = 0.4f;
+    cTextZ = 0.4f,
+    cTextBgY = cTextY - 0.005f,
+    cTextBgX = 0,
+    cTextBgZ = 0.404f,
+    cTextBgH = cTextH + 0.01f,
+    cTextBgW = 1,
+    cCopyrightH = 0.02f,
+    cCopyrightX = 0.001f,
+    cCopyrightY = 1 - cCopyrightH - 0.001f,
+    cCopyrightZ = 0.403f;
+
+  static constexpr glm::vec4
+    cTextBgClr{0, 0, 0, 0.75f},
+    cHoverTextBgClr{1, 1, 1, 0.75f};
 
   bool mHoveringText = false;
 
@@ -154,19 +167,163 @@ private:
     f32 textY = cTextY - measure.y / 2.0f;
     mHoveringText = (mousePos.x >= textX && mousePos.x < textX + measure.x
                   && mousePos.y >= textY && mousePos.y < textY + measure.y);
-    console::print("RECALCULATED mHoveringText={}",
-      mHoveringText);
-    console::print(" textX={}, textY={}",
-      textX, textY);
-    console::print(" measure.x={}, measure.y={}",
-      measure.x, measure.y);
-    console::print(" mousePos.x={}, mousePos.y={}",
-      mousePos.x, mousePos.y);
   }
 
   static constexpr glm::vec3
     cTextColor{1, 1, 1},
-    cHoverTextColor{1, 1, 0};
+    cHoverTextColor{0, 0, 0};
+
+  struct ReviewManager {
+    Array<String<>> reviews;
+
+    bool load(data::RW &file) {
+      ScratchArray<char> data{usize(file.size())};
+      if(!file.read(data.view())) {
+        errorBox("Error", "Could not load reviews: I/O error");
+        return false;
+      }
+      auto res = json::parse(data.view());
+      if(res.error != json::OK) {
+        errorBox("Error", "Could not load reviews: Invalid JSON ({})",
+          json::errorMessage(res.error));
+        return false;
+      }
+      if(!res.value->isArray()) {
+        errorBox("Error", "Could not load reviews: Not an array");
+        return false;
+      }
+
+      auto array = res.value->array();
+      reviews = {array.size()};
+      for(usize i = 0; i < reviews.size(); ++i) {
+        const auto &value = array[i];
+        if(!value.isObject()) {
+          errorBox("Error", "Could not load review {}: Not an object",
+            i);
+          return false;
+        }
+        const auto &object = value.object();
+        const auto *personV = object.get("person");
+        if(personV == nullptr || !personV->isString()) {
+          errorBox("Error", "Could not load review {}: Invalid `person`",
+            i);
+          return false;
+        }
+        const auto *quoteV = object.get("quote");
+        if(quoteV == nullptr || !quoteV->isString()) {
+          errorBox("Error", "Could not load review {}: Invalid `quote`",
+            i);
+          return false;
+        }
+        const auto *ratingV = object.get("rating");
+        if(ratingV == nullptr || !ratingV->isNumber()) {
+          errorBox("Error", "Could not load review {}: Invalid `rating`",
+            i);
+          return false;
+        }
+        reviews[i] = String<>::formatted("\"{} {}/10\"\n   ~ {}",
+          quoteV->string(), ratingV->number(), personV->string());
+      }
+
+      console::note("Loaded {} reviews.", reviews.size());
+      for(const auto &review: reviews) {
+        console::print(review);
+      }
+
+      reviewIdxDis = std::uniform_int_distribution<usize>{0, reviews.size() - 1};
+
+      return true;
+    }
+
+    static constexpr s32 cInstanceCount = 10;
+    static constexpr f32
+      cReviewDecaySpeed = 0.015f,
+      cReviewDeath = 1.01f,
+      cReviewMinX = 0.2f,
+      cReviewMaxX = 0.8f,
+      cReviewMinY = 0.2f,
+      cReviewMaxY = 0.8f,
+      cReviewMinZ = cLogoZ + 0.01f,
+      cReviewMaxZ = cLogoZ + 0.3f,
+      cReviewIncZ = 0.01f,
+      cReviewFontH = 0.075f;
+
+    std::uniform_int_distribution<usize> reviewIdxDis;
+
+    struct Instance {
+      StringView text;
+      glm::vec3 pos{};
+      f32 fadeIn = 0.0f;
+      ReviewManager *reviewManager = nullptr;
+
+      void reset(ReviewManager *newReviewManager = nullptr) {
+        static std::mt19937 sEng{std::random_device{}()};
+        static std::uniform_real_distribution<f32>
+          sXDis{cReviewMinX, cReviewMaxX};
+        static std::uniform_real_distribution<f32>
+          sYDis{cReviewMinY, cReviewMaxY};
+        static std::uniform_real_distribution<f32>
+          sZDis{cReviewMinZ, cReviewMaxZ};
+
+        pos.x = sXDis(sEng);
+        pos.y = sYDis(sEng);
+        pos.z = sZDis(sEng);
+        fadeIn = 1;
+        if(newReviewManager != nullptr) {
+          reviewManager = newReviewManager;
+        }
+        if(reviewManager != nullptr) {
+          auto idx = reviewManager->reviewIdxDis(sEng);
+          text = reviewManager->reviews[idx];
+        }
+      }
+
+      void update(f32 delta) {
+        if(fadeIn > 0) {
+          fadeIn -= delta;
+        }
+        pos.z += cReviewDecaySpeed * delta;
+        if(pos.z >= cReviewMaxZ) {
+          reset();
+        }
+      }
+
+      void render(f32 visualZ, const render::Font &font) const {
+        f32 inverseZ = 1.0f - pos.z;
+        f32 scale = 1.0f - (pos.z - cReviewMinZ) / (cReviewMaxZ - cReviewMinZ);
+        f32 alpha = fadeIn > 0 ? 1.0f - fadeIn : 1;
+        render::color({1, 1, 1, scale * alpha});
+        f32 height = cReviewFontH * inverseZ;
+        auto measure = font.measure(text, height);
+        font.draw(text,
+          {pos.x - measure.x / 2,
+          pos.y - measure.y / 2,
+          visualZ},
+          height);
+      }
+    };
+    std::array<Instance, cInstanceCount> instances;
+    
+    void populateInstances() {
+      for(auto &instance: instances) {
+        instance.reset(this);
+      }
+    }
+    
+    void updateInstances(f32 delta) {
+      for(auto &instance: instances) {
+        instance.update(delta);
+      }
+    }
+    
+    void renderInstances(const render::Font &font) const {
+      for(s32 i = 0; i < cInstanceCount; ++i) {
+        const auto &instance = instances[i];
+        f32 visualZ = cReviewMinZ + f32(cInstanceCount - i) * cReviewIncZ;
+        instance.render(visualZ, font);
+      }
+    }
+  } mReviewManager;
 
 public:
   bool preload() override {
@@ -174,12 +331,14 @@ public:
       .load({"sbs.bndl"})
       .nqTexture("logo2.png", mLogo)
       .nqTexture("brick.png", mBrickTexture)
-      .nqFont("inter.cfn", mFont);
+      .nqFont("inter.cfn", mFont)
+      .nqCustom("reviews.json", mReviewManager);
     return true;
   }
 
   bool init() override {
     populateBricks();
+    mReviewManager.populateInstances();
     return true;
   }
 
@@ -206,6 +365,7 @@ public:
 
   bool tick(f32 delta) override {
     updateBricks(delta);
+    mReviewManager.updateInstances(delta);
 
     if(mFadeIn < cFadeInDur) {
       mFadeIn += delta;
@@ -229,12 +389,20 @@ public:
     render::rect(m1x1.pos(cLogoPos), m1x1.size(cLogoSize), mLogo);
 
     renderBricks(mBrickTexture, m1x1);
+    mReviewManager.renderInstances(mFont);
 
     auto measure = mFont.measure("Shit", cTextH);
     f32 textX = cTextX - measure.x / 2.0f;
     f32 textY = cTextY - measure.y / 2.0f;
+    f32 textBgY = cTextBgY - measure.y / 2.0f;
+    render::color(mHoveringText ? cHoverTextBgClr : cTextBgClr);
+    render::rect({cTextBgX, textBgY, cTextBgZ}, {cTextBgW, cTextBgH});
     render::color(mHoveringText ? cHoverTextColor : cTextColor);
     mFont.draw("Shit", {textX, textY, cTextZ}, cTextH);
+
+    render::color();
+    mFont.draw("Copyright (c) qeaml & domi9 2024",
+      {cCopyrightX, cCopyrightY, cCopyrightZ}, cCopyrightH);
 
     if(mFadeIn < cFadeInDur) {
       render::color({0, 0, 0, 1.0f - mFadeIn/cFadeInDur});
