@@ -15,23 +15,19 @@ private:
   data::Bundle mBundle;
   render::gl::Texture mBarsTexture;
 
-  static constexpr f32 cBarFillOff = 0.001f;
-
-  s32 mBoilFrame = 0;
-  f32 mBoilTimer = 0.0f;
-  static constexpr f32 cBoilTime = 0.75f;
+  static constexpr f32
+    cBarFillOff = 0.001f,
+    cBarBgClrMult = 0.1f;
 
   void renderBar(glm::vec3 pos, glm::vec2 size, f32 progress, glm::vec3 color) const {
-    f32 texX = mBoilFrame == 1 ? 0.5f : 0.0f;
-
     render::color(color);
     render::setScissorEnabled();
     render::scissor({pos.x, pos.y}, {size.x, size.y * progress});
-    render::rect({pos.x, pos.y, pos.z + cBarFillOff}, size, mBarsTexture, {{texX, 0.5}, {0.5, 0.5}});
+    render::rect({pos.x, pos.y, pos.z - cBarFillOff}, size, mBarsTexture);
     render::setScissorEnabled(false);
 
-    // render::color();
-    render::rect(pos, size, mBarsTexture, {{texX, 0}, {0.5f, 0.5f}});
+    render::color(color * cBarBgClrMult);
+    render::rect(pos, size);
   }
 
   f32 mEffort = 0.0f;
@@ -294,16 +290,6 @@ public:
     if(mBrickFall >= 0) {
       mBrickFall += mConfig.brickFallSpeed * delta;
     }
-
-    mBoilTimer += delta;
-    if(mBoilTimer >= cBoilTime) {
-      if(mBoilFrame == 0) {
-        mBoilFrame = 1;
-      } else {
-        mBoilFrame = 0;
-      }
-      mBoilTimer = 0;
-    }
     return true;
   }
 
@@ -343,9 +329,7 @@ public:
     render::rect(
       {cWaterX, waterY, cWaterZ},
       {cWaterW, cWaterH},
-      mWaterTexture,
-      {{0, mBoilFrame == 0 ? 0 : 0.5f},
-        {1, 0.5f}});
+      mWaterTexture);
 
     render::color();
     auto measure = mFont.measure(mScoreString, cTextH);
