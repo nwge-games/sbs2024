@@ -1,6 +1,7 @@
 #include "states.hpp"
 #include "save.hpp"
 #include <cmath>
+#include <nwge/console/Command.hpp>
 #include <nwge/data/bundle.hpp>
 #include <nwge/data/store.hpp>
 #include <nwge/render/draw.hpp>
@@ -169,6 +170,52 @@ private:
   Config mConfig;
   Savefile mSave{};
 
+  console::Command mLubeCommand{"sbs.lube", [this](auto &args){
+    if(args.size() == 0) {
+      console::print("lube tier: {}", mSave.lubeTier);
+    }
+    if(args.size() == 1) {
+      try {
+        mSave.lubeTier = boost::lexical_cast<s16>(args[0].begin(), args[0].size());
+        console::print("lube tier: {}", mSave.lubeTier);
+      } catch(boost::bad_lexical_cast &e) {
+        console::error("bad numeric literal: {}", args[0]);
+      }
+    }
+  }};
+
+  console::Command mGravityCommand{"sbs.gravity", [this](auto &args){
+    if(args.size() == 0) {
+      console::print("gravity tier: {}", mSave.gravityTier);
+    }
+    if(args.size() == 1) {
+      try {
+        mSave.gravityTier = boost::lexical_cast<s16>(args[0].begin(), args[0].size());
+        console::print("gravity tier: {}", mSave.gravityTier);
+      } catch(boost::bad_lexical_cast &e) {
+        console::error("bad numeric literal: {}", args[0]);
+      }
+    }
+  }};
+
+  console::Command mScoreCommand{"sbs.score", [this](auto &args){
+    if(args.size() == 0) {
+      console::print("score: {}", mSave.score);
+    }
+    if(args.size() == 1) {
+      try {
+        mSave.score = boost::lexical_cast<s16>(args[0].begin(), args[0].size());
+        console::print("score: {}", mSave.score);
+      } catch(boost::bad_lexical_cast &e) {
+        console::error("bad numeric literal: {}", args[0]);
+      }
+    }
+  }};
+
+  console::Command mResetCommand{"sbs.reset", [this](){
+    resetSave();
+  }};
+
 public:
   bool preload() override {
     mBundle
@@ -192,52 +239,6 @@ public:
     recalculateProgressDecay();
     recalculateGravity();
     refreshScoreString();
-    console::registerCmd("sbs.lube", [this](auto &args){
-      if(args.size() == 0) {
-        console::print("lube tier: {}", mSave.lubeTier);
-      }
-      if(args.size() == 1) {
-        try {
-          mSave.lubeTier = boost::lexical_cast<s16>(args[0].begin(), args[0].size());
-          console::print("lube tier: {}", mSave.lubeTier);
-        } catch(boost::bad_lexical_cast &e) {
-          console::error("bad numeric literal: {}", args[0]);
-        }
-      }
-      return true;
-    });
-    console::registerCmd("sbs.gravity", [this](auto &args){
-      if(args.size() == 0) {
-        console::print("gravity tier: {}", mSave.gravityTier);
-      }
-      if(args.size() == 1) {
-        try {
-          mSave.gravityTier = boost::lexical_cast<s16>(args[0].begin(), args[0].size());
-          console::print("gravity tier: {}", mSave.gravityTier);
-        } catch(boost::bad_lexical_cast &e) {
-          console::error("bad numeric literal: {}", args[0]);
-        }
-      }
-      return true;
-    });
-    console::registerCmd("sbs.score", [this](auto &args){
-      if(args.size() == 0) {
-        console::print("score: {}", mSave.score);
-      }
-      if(args.size() == 1) {
-        try {
-          mSave.score = boost::lexical_cast<s16>(args[0].begin(), args[0].size());
-          console::print("score: {}", mSave.score);
-        } catch(boost::bad_lexical_cast &e) {
-          console::error("bad numeric literal: {}", args[0]);
-        }
-      }
-      return true;
-    });
-    console::registerCmd("sbs.reset", [this](auto&){
-      resetSave();
-      return true;
-    });
     return true;
   }
 
@@ -364,7 +365,7 @@ public:
       mBrickTexture);
 
     f32 waterY = cWaterMinY + (sinf(mTimer) + 1) * (cWaterMaxY - cWaterMinY);
-    render::color({1, 1, 1, 0.75f});
+    render::color({1, 1, 1, 0.5f});
     render::rect(
       {cWaterX, waterY, cWaterZ},
       {cWaterW, cWaterH},
