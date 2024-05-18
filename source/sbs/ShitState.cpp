@@ -1,10 +1,12 @@
 #include "states.hpp"
+#include "save.hpp"
 #include <cmath>
 #include <nwge/data/bundle.hpp>
 #include <nwge/data/store.hpp>
 #include <nwge/render/draw.hpp>
 #include <nwge/render/gl/Texture.hpp>
 #include <nwge/render/window.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace nwge;
 
@@ -73,18 +75,15 @@ private:
   static constexpr f32
     cCooldownValue = 5.0f;
 
-  s16 mLubeTier = 0;
-  s16 mGravityTier = 0;
-
   f32 mGravity = 0.0f;
   f32 mProgressDecay = 0.9f;
 
   void recalculateProgressDecay() {
-    mProgressDecay = mConfig.lube.base - f32(mLubeTier) * mConfig.lube.upgrade;
+    mProgressDecay = mConfig.lube.base - f32(mSave.lubeTier) * mConfig.lube.upgrade;
   }
 
   void recalculateGravity() {
-    mGravity = mConfig.gravity.base + f32(mGravityTier) * mConfig.gravity.upgrade;
+    mGravity = mConfig.gravity.base + f32(mSave.gravityTier) * mConfig.gravity.upgrade;
   }
 
   render::gl::Texture mBrickTexture;
@@ -98,11 +97,7 @@ private:
     cBrickFallEndY = 1.0f,
     cBrickW = 0.04f,
     cBrickH = 0.08f,
-    cBrickZ = 0.55f;
-
-  s32 mScore = 0;
-
-  static constexpr f32
+    cBrickZ = 0.55f,
     cTextH = 0.05f,
     cTextX = 0.5f,
     cTextY = 0.075f,
@@ -112,7 +107,7 @@ private:
   ScratchString mScoreString;
 
   void refreshScoreString() {
-    mScoreString = ScratchString::formatted("Score: {}", mScore);
+    mScoreString = ScratchString::formatted("Score: {}", mSave.score);
   }
 
   render::gl::Texture mWaterTexture;
@@ -135,16 +130,16 @@ private:
 
   data::Store mStore;
 
-  void autosave() {
+  void save() {
     mStore.nqSave("progress", [this](auto &file){
-      if(!file.write(mScore)) {
-        return false;
-      }
-      if(!file.write(mLubeTier)) {
-        return false;
-      }
-      return file.write(mGravityTier);
+      return mSave.save(file);
     });
+    refreshScoreString();
+  }
+
+  void resetSave() {
+    mSave = {};
+    save();
   }
 
   render::gl::Texture mIconsTexture;
@@ -156,7 +151,11 @@ private:
     cStoreIconH = 0.05f,
     cStoreIconX = cTextX + 0.2f,
     cStoreIconY = cTextY,
-    cStoreIconZ = 0.52f;
+    cStoreIconZ = 0.52f,
+    cStoreIconTexX = 0.0f/1.0f,
+    cStoreIconTexY = 0.0f/1.0f,
+    cStoreIconTexW = 1.0f/1.0f,
+    cStoreIconTexH = 1.0f/1.0f;
 
   static constexpr glm::vec3
     cHoverColor{1, 1, 0};
@@ -168,6 +167,7 @@ private:
   }
 
   Config mConfig;
+  Savefile mSave{};
 
 public:
   bool preload() override {
@@ -179,19 +179,11 @@ public:
       .nqTexture("water.png", mWaterTexture)
       .nqTexture("bg.png", mBgTexture)
       .nqCustom("cfg.json", mConfig)
-      .nqTexture("vignette.png", mVignetteTexture);
+      .nqTexture("vignette.png", mVignetteTexture)
+      .nqTexture("icons.png", mIconsTexture);
     mStore.nqLoad("progress",
       [this](auto &file){
-        if(!file.read(mScore)) {
-          return false;
-        }
-        if(!file.read(mLubeTier)) {
-          return false;
-        }
-        if(!file.read(mGravityTier)) {
-          return false;
-        }
-        return true;
+        return mSave.load(file);
       });
     return true;
   }
@@ -200,6 +192,52 @@ public:
     recalculateProgressDecay();
     recalculateGravity();
     refreshScoreString();
+    console::registerCmd("sbs.lube", [this](auto &args){
+      if(args.size() == 0) {
+        console::print("lube tier: {}", mSave.lubeTier);
+      }
+      if(args.size() == 1) {
+        try {
+          mSave.lubeTier = boost::lexical_cast<s16>(args[0].begin(), args[0].size());
+          console::print("lube tier: {}", mSave.lubeTier);
+        } catch(boost::bad_lexical_cast &e) {
+          console::error("bad numeric literal: {}", args[0]);
+        }
+      }
+      return true;
+    });
+    console::registerCmd("sbs.gravity", [this](auto &args){
+      if(args.size() == 0) {
+        console::print("gravity tier: {}", mSave.gravityTier);
+      }
+      if(args.size() == 1) {
+        try {
+          mSave.gravityTier = boost::lexical_cast<s16>(args[0].begin(), args[0].size());
+          console::print("gravity tier: {}", mSave.gravityTier);
+        } catch(boost::bad_lexical_cast &e) {
+          console::error("bad numeric literal: {}", args[0]);
+        }
+      }
+      return true;
+    });
+    console::registerCmd("sbs.score", [this](auto &args){
+      if(args.size() == 0) {
+        console::print("score: {}", mSave.score);
+      }
+      if(args.size() == 1) {
+        try {
+          mSave.score = boost::lexical_cast<s16>(args[0].begin(), args[0].size());
+          console::print("score: {}", mSave.score);
+        } catch(boost::bad_lexical_cast &e) {
+          console::error("bad numeric literal: {}", args[0]);
+        }
+      }
+      return true;
+    });
+    console::registerCmd("sbs.reset", [this](auto&){
+      resetSave();
+      return true;
+    });
     return true;
   }
 
@@ -208,9 +246,7 @@ public:
       updateHoveringStoreIcon(evt.click.pos);
       if(mHoveringStoreIcon) {
         StoreData data{
-          mScore,
-          mLubeTier,
-          mGravityTier,
+          mSave,
           mConfig,
           mFont,
           mIconsTexture,
@@ -236,6 +272,10 @@ public:
   }
 
   bool tick(f32 delta) override {
+    if(mSave.dirty) {
+      save();
+    }
+
     mTimer += delta;
 
     if(mEffort > 0) {
@@ -268,9 +308,8 @@ public:
       if(mProgress >= 1) {
         mCooldown = cCooldownValue;
         mBrickFall = 0.0f;
-        ++mScore;
-        refreshScoreString();
-        autosave();
+        ++mSave.score;
+        save();
       } else if(mProgress > 0) {
         mProgress -= mProgressDecay * delta;
         if(mProgress < 0) {
@@ -342,7 +381,10 @@ public:
     render::rect(
       {cStoreIconX, cStoreIconY, cStoreIconZ},
       {cStoreIconW, cStoreIconH},
-      mIconsTexture);
+      mIconsTexture,
+      {
+        {cStoreIconTexX, cStoreIconTexY},
+        {cStoreIconTexW, cStoreIconTexH}});
 
     f32 vignetteAlpha = fmaxf(mEffort, 1.0f - mOxy);
     render::color({1, 1, 1, vignetteAlpha});

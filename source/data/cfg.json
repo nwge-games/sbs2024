@@ -1,7 +1,7 @@
 {
   "lube": {
     "base": 0.095,
-    "upgrade": 0.005,
+    "upgrade": 0.03,
     "maxTier": 2
   },
   "gravity": {

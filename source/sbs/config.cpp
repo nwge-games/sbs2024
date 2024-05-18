@@ -1,4 +1,5 @@
 #include "config.hpp"
+#include <nwge/console.hpp>
 #include <nwge/common/err.hpp>
 #include <nwge/json.hpp>
 #include <SDL2/SDL_error.h>
@@ -70,6 +71,18 @@ bool Config::load(data::RW &file) {
     return false;
   }
   brickFallSpeed = static_cast<f32>(brickFallSpeedV->number());
+
+  console::note("Loaded config:");
+  console::print("  Lube:");
+  console::print("    Base: {}", lube.base);
+  console::print("    Upgrade: {}", lube.upgrade);
+  console::print("    Max Tier: {}", lube.maxTier);
+  console::print("  Gravity:");
+  console::print("    Base: {}", gravity.base);
+  console::print("    Upgrade: {}", gravity.upgrade);
+  console::print("    Threshold: {}", gravity.threshold);
+  console::print("    Max Tier: {}", gravity.maxTier);
+  console::print("  Brick Fall Speed: {}", brickFallSpeed);
 
   return true;
 }
@@ -278,7 +291,7 @@ bool loadStore(Config &out, const json::Object &root) {
 
     const auto *lubeTierV = itemObject.get("lubeTier");
     if(lubeTierV != nullptr) {
-      item.kind = Config::StoreItem::Lube;
+      item.kind = StoreItem::Lube;
       if(!lubeTierV->isNumber()) {
         errorBox("Config",
           "Configuration file is invalid.\n"
@@ -291,7 +304,7 @@ bool loadStore(Config &out, const json::Object &root) {
     }
     const auto *gravityTierV = itemObject.get("gravityTier");
     if(gravityTierV != nullptr) {
-      item.kind = Config::StoreItem::Gravity;
+      item.kind = StoreItem::Gravity;
       if(!gravityTierV->isNumber()) {
         errorBox("Config",
           "Configuration file is invalid.\n"
@@ -304,7 +317,7 @@ bool loadStore(Config &out, const json::Object &root) {
     }
     const auto *endGameV = itemObject.get("endGame");
     if(endGameV != nullptr) {
-      item.kind = Config::StoreItem::EndGame;
+      item.kind = StoreItem::EndGame;
       continue;
     }
     errorBox("Config",
@@ -313,7 +326,6 @@ bool loadStore(Config &out, const json::Object &root) {
       i);
     return false;
   }
-
   return true;
 }
 

@@ -22,6 +22,7 @@ private:
   f32 mFadeIn = 0.0f;
   f32 mFadeOut = -1.0f;
   static constexpr f32
+    cVignetteZ = 0.409f,
     cFadeZ = 0.1f,
     cFadeInDur = 2.0f,
     cFadeOutDur = 2.0f;
@@ -232,12 +233,7 @@ private:
       }
 
       console::note("Loaded {} reviews.", reviews.size());
-      for(const auto &review: reviews) {
-        console::print(review);
-      }
-
       reviewIdxDis = std::uniform_int_distribution<usize>{0, reviews.size() - 1};
-
       return true;
     }
 
@@ -331,6 +327,8 @@ private:
     }
   } mReviewManager;
 
+  render::gl::Texture mVignetteTexture;
+
 public:
   bool preload() override {
     mBundle
@@ -338,7 +336,8 @@ public:
       .nqTexture("logo2.png", mLogo)
       .nqTexture("brick.png", mBrickTexture)
       .nqFont("inter.cfn", mFont)
-      .nqCustom("reviews.json", mReviewManager);
+      .nqCustom("reviews.json", mReviewManager)
+      .nqTexture("vignette.png", mVignetteTexture);
     return true;
   }
 
@@ -407,6 +406,8 @@ public:
     mFont.draw("Shit", {textX, textY, cTextZ}, cTextH);
 
     render::color();
+    render::rect({0, 0, cVignetteZ}, {1, 1}, mVignetteTexture);
+
     mFont.draw("Copyright (c) qeaml & domi9 2024",
       {cCopyrightX, cCopyrightY, cCopyrightZ}, cCopyrightH);
     measure = mFont.measure(SBS_VER_STR, cVerH);

@@ -13,6 +13,20 @@ The config
 
 namespace sbs {
 
+struct StoreItem {
+  enum Kind: s16 {
+    None,
+    Lube,    // when bought lubeTier = argument
+    Gravity, // when bought gravityTier = argument
+    EndGame  // when bough close game & wipe save
+  } kind = None;
+  s16 argument = 0;
+
+  s32 price = 1;
+  nwge::String<> name;
+  nwge::String<> desc;
+};
+
 struct Config {
   struct Lube {
     f32 base;
@@ -26,22 +40,9 @@ struct Config {
     s16 maxTier;
   } gravity;
   f32 brickFallSpeed;
-  struct StoreItem {
-    enum Kind: s16 {
-      None,
-      Lube,    // when bought lubeTier = argument
-      Gravity, // when bought gravityTier = argument
-      EndGame  // when bough close game & wipe save
-    } kind = None;
-    s16 argument = 0;
-
-    s32 price = 1;
-    nwge::String<> name;
-    nwge::String<> desc;
-  };
   nwge::Array<StoreItem> store;
 
   bool load(nwge::data::RW &file);
 };
 
-}
+} // namespace sbs
