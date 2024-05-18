@@ -1,4 +1,5 @@
 #include "states.hpp"
+#include "version.h"
 #include <array>
 #include <nwge/data/bundle.hpp>
 #include <nwge/render/aspectRatio.hpp>
@@ -151,9 +152,14 @@ private:
     cTextBgH = cTextH + 0.01f,
     cTextBgW = 1,
     cCopyrightH = 0.02f,
-    cCopyrightX = 0.001f,
-    cCopyrightY = 1 - cCopyrightH - 0.001f,
-    cCopyrightZ = 0.403f;
+    cSmallTextPad = 0.003f,
+    cCopyrightX = cSmallTextPad,
+    cCopyrightY = 1 - cCopyrightH - cSmallTextPad,
+    cCopyrightZ = 0.403f,
+    cVerX = 1 - cSmallTextPad,
+    cVerY = cCopyrightY,
+    cVerZ = cCopyrightZ,
+    cVerH = cCopyrightH;
 
   static constexpr glm::vec4
     cTextBgClr{0, 0, 0, 0.75f},
@@ -403,6 +409,9 @@ public:
     render::color();
     mFont.draw("Copyright (c) qeaml & domi9 2024",
       {cCopyrightX, cCopyrightY, cCopyrightZ}, cCopyrightH);
+    measure = mFont.measure(SBS_VER_STR, cVerH);
+    textX = cVerX - measure.x;
+    mFont.draw(SBS_VER_STR, {textX, cVerY, cVerZ}, cVerH);
 
     if(mFadeIn < cFadeInDur) {
       render::color({0, 0, 0, 1.0f - mFadeIn/cFadeInDur});
