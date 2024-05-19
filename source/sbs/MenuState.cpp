@@ -24,8 +24,8 @@ private:
   static constexpr f32
     cVignetteZ = 0.409f,
     cFadeZ = 0.1f,
-    cFadeInDur = 2.0f,
-    cFadeOutDur = 2.0f;
+    cFadeInDur = 1.0f,
+    cFadeOutDur = 1.0f;
 
   render::AspectRatio m1x1{1, 1};
   static constexpr f32

@@ -18,9 +18,9 @@ private:
   f32 mLinger = 0.0f;
   f32 mFadeOut = 0.0f;
   static constexpr f32
-    cFadeInDur = 2.0f,
-    cLingerDur = 3.0f,
-    cFadeOutDur = 2.0f;
+    cFadeInDur = 1.0f,
+    cLingerDur = 1.0f,
+    cFadeOutDur = 1.0f;
 
   render::AspectRatio m1x1{1, 1};
   static constexpr f32

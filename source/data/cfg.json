@@ -1,16 +1,21 @@
 {
   "lube": {
-    "base": 0.095,
+    "base": 0.1,
     "upgrade": 0.03,
     "maxTier": 2
   },
   "gravity": {
-    "base": 0.001,
-    "upgrade": 0.05,
+    "base": 0.002,
+    "upgrade": 0.1,
     "threshold": 0.75,
     "maxTier": 2
   },
-  "brickFallSpeed": 1.5,
+  "oxy": {
+    "regen": 0.2,
+    "drain": 0.65,
+    "min": 0.1
+  },
+  "brickFallSpeed": 3.0,
   "store": [
     {
       "name": "Chinese Lube",

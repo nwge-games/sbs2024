@@ -39,6 +39,11 @@ struct Config {
     f32 threshold;
     s16 maxTier;
   } gravity;
+  struct Oxy {
+    f32 regen;
+    f32 drain;
+    f32 min;
+  } oxy;
   f32 brickFallSpeed;
   nwge::Array<StoreItem> store;
 

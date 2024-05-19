@@ -36,7 +36,7 @@ private:
   f32 mEffort = 0.0f;
 
   static constexpr f32
-    cEffortDecay = 0.1f,
+    cEffortDecay = 0.3f,
     cEffortIncrement = 0.1f,
     cMaxEffort = 1.0f;
 
@@ -50,11 +50,6 @@ private:
     cEffortBarColor{2, 2, 0};
 
   f32 mOxy = 1.0f;
-
-  static constexpr f32
-    cOxyRegen = 0.1f,
-    cOxyDrain = 0.5f,
-    cMinOxy = 0.1f;
 
   bool mOuttaBreath = false;
 
@@ -74,7 +69,7 @@ private:
   f32 mCooldown = 0.0f;
 
   static constexpr f32
-    cCooldownValue = 5.0f;
+    cCooldownValue = 3.0f;
 
   f32 mGravity = 0.0f;
   f32 mProgressDecay = 0.9f;
@@ -132,9 +127,7 @@ private:
   data::Store mStore;
 
   void save() {
-    mStore.nqSave("progress", [this](auto &file){
-      return mSave.save(file);
-    });
+    mStore.nqSave("progress", mSave);
     refreshScoreString();
   }
 
@@ -228,10 +221,7 @@ public:
       .nqCustom("cfg.json", mConfig)
       .nqTexture("vignette.png", mVignetteTexture)
       .nqTexture("icons.png", mIconsTexture);
-    mStore.nqLoad("progress",
-      [this](auto &file){
-        return mSave.load(file);
-      });
+    mStore.nqLoad("progress", mSave);
     return true;
   }
 
@@ -261,7 +251,7 @@ public:
       if(!mOuttaBreath
       && mCooldown <= 0
       && mEffort < cMaxEffort
-      && mOxy >= cMinOxy) {
+      && mOxy >= mConfig.oxy.min) {
         mEffort += cEffortIncrement;
         return true;
       }
@@ -290,12 +280,12 @@ public:
     }
 
     if(mOxy < 1.0f) {
-      mOxy += cOxyRegen * delta;
+      mOxy += mConfig.oxy.regen * delta;
     } else {
       mOuttaBreath = false;
     }
 
-    mOxy -= mEffort * cOxyDrain * delta;
+    mOxy -= mEffort * mConfig.oxy.drain * delta;
     if(mOxy <= 0) {
       mOuttaBreath = true;
       mOxy = 0;

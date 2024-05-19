@@ -10,6 +10,7 @@ namespace sbs {
 
 static bool loadLube(Config &out, const json::Object &root);
 static bool loadGravity(Config &out, const json::Object &root);
+static bool loadOxy(Config &out, const json::Object &root);
 static bool loadStore(Config &out, const json::Object &root);
 
 bool Config::load(data::RW &file) {
@@ -50,6 +51,10 @@ bool Config::load(data::RW &file) {
   }
 
   if(!loadGravity(*this, root)) {
+    return false;
+  }
+
+  if(!loadOxy(*this, root)) {
     return false;
   }
 
@@ -226,6 +231,70 @@ bool loadGravity(Config &out, const json::Object &root) {
     return false;
   }
   out.gravity.maxTier = static_cast<s16>(maxTierV->number());
+
+  return true;
+}
+
+bool loadOxy(Config &out, const json::Object &root) {
+  const auto *oxyV = root.get("oxy");
+  if(oxyV == nullptr) {
+    errorBox("Config",
+      "Configuration file is invalid.\n"
+      "No `oxy` key.");
+    return false;
+  }
+  if(!oxyV->isObject()) {
+    errorBox("Config",
+      "Configuration file is invalid.\n"
+      "`oxy` is not a object.");
+    return false;
+  }
+  const auto &oxyObject = oxyV->object();
+
+  const auto *regenV = oxyObject.get("regen");
+  if(regenV == nullptr) {
+    errorBox("Config",
+      "Configuration file is invalid.\n"
+      "No `regen` in key in `oxy` object.");
+    return false;
+  }
+  if(!regenV->isNumber()) {
+    errorBox("Config",
+      "Configuration file is invalid.\n"
+      "`regen` in `oxy` object is not a number.");
+    return false;
+  }
+  out.oxy.regen = static_cast<f32>(regenV->number());
+
+  const auto *drainV = oxyObject.get("drain");
+  if(drainV == nullptr) {
+    errorBox("Config",
+      "Configuration file is invalid.\n"
+      "No `drain` in key in `oxy` object.");
+    return false;
+  }
+  if(!drainV->isNumber()) {
+    errorBox("Config",
+      "Configuration file is invalid.\n"
+      "`drain` in `oxy` object is not a number.");
+    return false;
+  }
+  out.oxy.drain = static_cast<f32>(drainV->number());
+
+  const auto *minV = oxyObject.get("min");
+  if(minV == nullptr) {
+    errorBox("Config",
+      "Configuration file is invalid.\n"
+      "No `min` in key in `oxy` object.");
+    return false;
+  }
+  if(!minV->isNumber()) {
+    errorBox("Config",
+      "Configuration file is invalid.\n"
+      "`min` in `oxy` object is not a number.");
+    return false;
+  }
+  out.oxy.min = static_cast<f32>(minV->number());
 
   return true;
 }
