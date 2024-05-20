@@ -114,15 +114,19 @@ private:
     cWaterX = 0,
     cWaterMinY = 1.0f - cWaterH,
     cWaterMaxY = cWaterMinY + cWaterH/8,
+    cWaterAlpha = 0.56f,
     cWaterZ = 0.54f;
 
   f32 mTimer = 0.0f;
+
+  static constexpr f32 cFadeInTime = 1.0f;
 
   render::gl::Texture mBgTexture, mVignetteTexture;
 
   static constexpr f32
     cBgZ = 0.6f,
-    cVignetteZ = 0.41f;
+    cVignetteZ = 0.41f,
+    cFadeZ = 0.405f;
 
   data::Store mStore;
 
@@ -233,6 +237,9 @@ public:
   }
 
   bool on(Event &evt) override {
+    if(mTimer < cFadeInTime) {
+      return true;
+    }
     if(evt.type == Event::MouseDown) {
       updateHoveringStoreIcon(evt.click.pos);
       if(mHoveringStoreIcon) {
@@ -268,6 +275,10 @@ public:
     }
 
     mTimer += delta;
+
+    if(mTimer < cFadeInTime) {
+      return true;
+    }
 
     if(mEffort > 0) {
       mEffort -= cEffortDecay * delta;
@@ -380,6 +391,11 @@ public:
     f32 vignetteAlpha = fmaxf(mEffort, 1.0f - mOxy);
     render::color({1, 1, 1, vignetteAlpha});
     render::rect({0, 0, cVignetteZ}, {1, 1}, mVignetteTexture);
+
+    if(mTimer < cFadeInTime) {
+      render::color({0, 0, 0, 1.0f - mTimer / cFadeInTime});
+      render::rect({0, 0, cFadeZ}, {1,1});
+    }
   }
 };
 

@@ -15,6 +15,7 @@ namespace sbs {
 nwge::State *getIntroState();
 nwge::State *getMenuState();
 nwge::State *getShitState();
+nwge::State *getEndState();
 
 struct StoreData {
   Savefile &save;

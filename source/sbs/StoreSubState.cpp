@@ -89,6 +89,32 @@ private:
     cPurchaseFloatZ = 0.034f,
     cPurchaseFloatH = 0.034f;
 
+  void acquire(const StoreItem &item) {
+    if(mData.save.score < item.price) {
+      // broke ahh
+      mPurchaseFloat = cInsufficientFundsFloat;
+      mPurchaseFloatTimer = 0.0f;
+      return;
+    }
+    mData.save.score -= item.price;
+    mData.save.dirty = true;
+    switch(item.kind) {
+    case sbs::StoreItem::Lube:
+      mData.save.lubeTier = SDL_max(mData.save.lubeTier, item.argument);
+      break;
+    case sbs::StoreItem::Gravity:
+      mData.save.gravityTier = SDL_max(mData.save.gravityTier, item.argument);
+      break;
+    case sbs::StoreItem::EndGame:
+      swapStatePtr(getEndState());
+      return;
+    default:
+      break; // whatever
+    }
+    mPurchaseFloat = mItemHover;
+    mItemHover = -1;
+  }
+
 public:
   StoreSubState(StoreData data)
     : mData(data)
@@ -106,29 +132,9 @@ public:
         return true;
       }
       const auto &item = mData.config.store[mItemHover];
-      if(mData.save.score < item.price) {
-        // broke ahh
-        mPurchaseFloat = cInsufficientFundsFloat;
-        mPurchaseFloatAnchor = evt.click.pos;
-        mPurchaseFloatTimer = 0.0f;
-        return true;
-      }
-      mData.save.score -= item.price;
-      mData.save.dirty = true;
-      switch(item.kind) {
-      case sbs::StoreItem::Lube:
-        mData.save.lubeTier = SDL_max(mData.save.lubeTier, item.argument);
-        break;
-      case sbs::StoreItem::Gravity:
-        mData.save.gravityTier = SDL_max(mData.save.gravityTier, item.argument);
-        break;
-      default:
-        break; // whatever
-      }
-      mPurchaseFloat = mItemHover;
-      mItemHover = -1;
       mPurchaseFloatAnchor = evt.click.pos;
       mPurchaseFloatTimer = 0.0f;
+      acquire(item);
       return true;
     }
     if(evt.type == Event::MouseMotion) {
