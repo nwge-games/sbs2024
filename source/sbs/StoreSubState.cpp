@@ -1,5 +1,6 @@
 #include "config.hpp"
 #include "states.hpp"
+#include "ui.hpp"
 #include <nwge/render/draw.hpp>
 #include <nwge/render/window.hpp>
 #include <nwge/render/font.hpp>
@@ -29,14 +30,14 @@ private:
   static constexpr glm::vec4 cBgColor{0, 0, 0, 0.5};
 
   static constexpr glm::vec3
-    cWindowBgColor{0.4, 0.4, 0.4},
-    cItemBgColor{0.5, 0.5, 0.5},
-    cItemTextColor{1.0, 1.0, 1.0},
-    cItemHoverBgColor{0.75, 0.75, 0.75},
-    cItemOwnedBgColor{0.25, 0.25, 0.25},
-    cItemOwnedTextColor{0.75, 0.75, 0.75},
-    cInsufficientFundsColor{1, 0, 0},
-    cPurchaseFloatColor{0, 1, 0};
+    cWindowBgColor = cGrayMedDark,
+    cItemBgColor = cGrayMed,
+    cItemTextColor = cWhite,
+    cItemHoverBgColor = cGrayBright,
+    cItemOwnedBgColor = cGrayDark,
+    cItemOwnedTextColor = cGrayMed,
+    cInsufficientFundsColor = cRed,
+    cPurchaseFloatColor = cGreen;
   static constexpr f32
     cWindowW = 0.5f,
     cWindowH = 0.9f,
@@ -45,7 +46,7 @@ private:
     cWindowBgZ = 0.39f;
 
   static constexpr f32
-    cPad = 0.01f,
+    
     cTitleTextY = cWindowY + cPad,
     cTitleTextH = 0.08f,
     cTitleTextZ = 0.38f,
@@ -154,19 +155,6 @@ public:
   }
 
   void render() const override {
-    render::color(cBgColor);
-    render::rect({0, 0, cBgZ}, {1, 1});
-
-    render::color(cWindowBgColor);
-    render::rect(
-      {cWindowX, cWindowY, cWindowBgZ},
-      {cWindowW, cWindowH});
-
-    auto measure = mData.font.measure("Store", cTitleTextH);
-    f32 textX = 0.5f - measure.x / 2.0f;
-    render::color();
-    mData.font.draw("Store", {textX, cTitleTextY, cTitleTextZ}, cTitleTextH);
-
     static constexpr usize cTextBufSz = 100;
     std::array<char, cTextBufSz> textBuf{};
     bool owned;
@@ -207,6 +195,19 @@ public:
           cItemNameTextH);
       }
     }
+
+    render::color(cWindowBgColor);
+    render::rect(
+      {cWindowX, cWindowY, cWindowBgZ},
+      {cWindowW, cWindowH});
+
+    auto measure = mData.font.measure("Store", cTitleTextH);
+    f32 textX = 0.5f - measure.x / 2.0f;
+    render::color();
+    mData.font.draw("Store", {textX, cTitleTextY, cTitleTextZ}, cTitleTextH);
+
+    render::color(cBgColor);
+    render::rect({0, 0, cBgZ}, {1, 1});
 
     if(mPurchaseFloat != cNoPurchaseFloat) {
       f32 alpha = mPurchaseFloatTimer / cPurchaseFloatLifetime;

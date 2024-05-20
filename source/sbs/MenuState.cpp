@@ -147,11 +147,11 @@ private:
     cTextX = 0.5f,
     cTextY = 0.5f,
     cTextZ = 0.4f,
-    cTextBgY = cTextY - 0.005f,
-    cTextBgX = 0,
-    cTextBgZ = 0.404f,
+    cTextBgW = 0.5f,
     cTextBgH = cTextH + 0.01f,
-    cTextBgW = 1,
+    cTextBgX = (1.0f - cTextBgW) / 2,
+    cTextBgY = (1.0f - cTextBgH) / 2,
+    cTextBgZ = 0.404f,
     cCopyrightH = 0.02f,
     cSmallTextPad = 0.003f,
     cCopyrightX = cSmallTextPad,
@@ -162,9 +162,11 @@ private:
     cVerZ = cCopyrightZ,
     cVerH = cCopyrightH;
 
-  static constexpr glm::vec4
-    cTextBgClr{0, 0, 0, 0.75f},
-    cHoverTextBgClr{1, 1, 1, 0.75f};
+  static constexpr glm::vec3
+    cTextBgClr{0.5, 0.5, 0.5},
+    cHoverTextBgClr{0.75, 0.75, 0.75},
+    cTextColor{1, 1, 1},
+    cHoverTextColor{1, 1, 1};
 
   bool mHoveringText = false;
 
@@ -175,10 +177,6 @@ private:
     mHoveringText = (mousePos.x >= textX && mousePos.x < textX + measure.x
                   && mousePos.y >= textY && mousePos.y < textY + measure.y);
   }
-
-  static constexpr glm::vec3
-    cTextColor{1, 1, 1},
-    cHoverTextColor{0, 0, 0};
 
   struct ReviewManager {
     Array<String<>> reviews;
@@ -396,12 +394,12 @@ public:
     renderBricks(mBrickTexture, m1x1);
     mReviewManager.renderInstances(mFont);
 
+    render::color(mHoveringText ? cHoverTextBgClr : cTextBgClr);
+    render::rect({cTextBgX, cTextBgY, cTextBgZ}, {cTextBgW, cTextBgH});
+
     auto measure = mFont.measure("Shit", cTextH);
     f32 textX = cTextX - measure.x / 2.0f;
     f32 textY = cTextY - measure.y / 2.0f;
-    f32 textBgY = cTextBgY - measure.y / 2.0f;
-    render::color(mHoveringText ? cHoverTextBgClr : cTextBgClr);
-    render::rect({cTextBgX, textBgY, cTextBgZ}, {cTextBgW, cTextBgH});
     render::color(mHoveringText ? cHoverTextColor : cTextColor);
     mFont.draw("Shit", {textX, textY, cTextZ}, cTextH);
 

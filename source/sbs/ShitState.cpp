@@ -1,5 +1,6 @@
 #include "states.hpp"
 #include "save.hpp"
+#include "ui.hpp"
 #include <cmath>
 #include <nwge/console/Command.hpp>
 #include <nwge/data/bundle.hpp>
@@ -20,9 +21,10 @@ private:
 
   static constexpr f32
     cBarFillOff = 0.001f,
-    cBarBgClrMult = 0.1f;
+    cBarBgClrMult = 0.1f,
+    cBarTextH = 0.025f;
 
-  void renderBar(glm::vec3 pos, glm::vec2 size, f32 progress, glm::vec3 color) const {
+  void renderBar(const StringView &name, glm::vec3 pos, glm::vec2 size, f32 progress, glm::vec3 color) const {
     render::color(color);
     render::setScissorEnabled();
     render::scissor({pos.x, pos.y}, {size.x, size.y * progress});
@@ -31,6 +33,19 @@ private:
 
     render::color(color * cBarBgClrMult);
     render::rect(pos, size);
+
+    render::color(cGrayMedDark);
+    render::rect(
+      {pos.x - cPad, pos.y - cPad, pos.z + cBarFillOff},
+      {size.x + 2*cPad, size.y + 3*cPad + cBarTextH}
+    );
+
+    auto measure = mFont.measure(name, cBarTextH);
+    float textX =  size.x / 2 - measure.x / 2 + pos.x;
+    render::color();
+    mFont.draw(name,
+      {textX, pos.y + size.y + cPad, pos.z - 2*cBarFillOff},
+      cBarTextH);
   }
 
   f32 mEffort = 0.0f;
@@ -60,7 +75,8 @@ private:
     cOxyBarY = 0.075f,
     cOxyBarZ = 0.5f;
   static constexpr glm::vec3
-    cOxyBarColor{0, 2, 2};
+    cOxyBarColor{0, 1, 1},
+    cOxyBarBadColor{1, 0, 0};
 
   f32 mProgress = 0.0f;
 
@@ -339,15 +355,17 @@ public:
     render::rect({0, 0, cBgZ}, {1, 1}, mBgTexture);
 
     renderBar(
+      "Effort",
       {cEffortBarX, cEffortBarY, cEffortBarZ},
       {cEffortBarW, cEffortBarH},
       mEffort,
       cEffortBarColor);
     renderBar(
+      "Oxy",
       {cOxyBarX, cOxyBarY, cOxyBarZ},
       {cOxyBarW, cOxyBarH},
       mOxy,
-      cOxyBarColor);
+      mOuttaBreath ? cOxyBarBadColor : cOxyBarColor);
     render::color();
 
     if(mCooldown > 0 && mBrickFall < 0) {
