@@ -78,7 +78,8 @@ private:
 
   static constexpr s32
     cNoPurchaseFloat = -1,
-    cInsufficientFundsFloat = -2;
+    cInsufficientFundsFloat = -2,
+    cAlreadyOwnedFloat = -3;
 
   s32 mPurchaseFloat = cNoPurchaseFloat;
   f32 mPurchaseFloatTimer = 0.0f;
@@ -91,6 +92,13 @@ private:
     cPurchaseFloatH = 0.034f;
 
   void acquire(const StoreItem &item) {
+    if(hasItem(item)) {
+      mPurchaseFloat = cAlreadyOwnedFloat;
+      mPurchaseFloatTimer = 0.0f;
+      mData.brokeSound.play();
+      return;
+    }
+
     if(mData.save.score < item.price) {
       // broke ahh
       mPurchaseFloat = cInsufficientFundsFloat;
@@ -98,6 +106,7 @@ private:
       mData.brokeSound.play();
       return;
     }
+
     mData.save.score -= item.price;
     mData.save.dirty = true;
     switch(item.kind) {
@@ -220,6 +229,10 @@ public:
         render::color({cInsufficientFundsColor, 1.0f - alpha});
         len = snprintf(textBuf.data(), cTextBufSz,
           "Insufficient funds");
+      } else if(mPurchaseFloat == cAlreadyOwnedFloat) {
+        render::color({cInsufficientFundsColor, 1.0f - alpha});
+        len = snprintf(textBuf.data(), cTextBufSz,
+          "Already owned");
       } else {
         const auto &item = mData.config.store[mPurchaseFloat];
         render::color({cPurchaseFloatColor, 1.0f - alpha});

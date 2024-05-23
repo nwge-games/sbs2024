@@ -26,25 +26,25 @@
     {
       "name": "Super Lube",
       "desc": "Industrial-grade poop chute sloppifier.",
-      "price": 25,
+      "price": 15,
       "lubeTier": 2
     },
     {
       "name": "Gravity Intensifier",
       "desc": "Weird device that pulls things towards it.",
-      "price": 35,
+      "price": 25,
       "gravityTier": 1
     },
     {
       "name": "Mini Black Hole",
       "desc": "Pulls shit out really well.",
-      "price": 50,
+      "price": 35,
       "gravityTier": 2
     },
     {
       "name": "Supermassive Black Hole",
       "desc": "It sucks.",
-      "price": 100,
+      "price": 50,
       "endGame": true
     }
   ]
