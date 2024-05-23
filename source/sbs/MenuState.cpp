@@ -1,3 +1,4 @@
+#include "audio.hpp"
 #include "states.hpp"
 #include "version.h"
 #include <array>
@@ -327,6 +328,8 @@ private:
 
   render::gl::Texture mVignetteTexture;
 
+  Sound mConfirmation;
+
 public:
   bool preload() override {
     mBundle
@@ -358,6 +361,7 @@ public:
       recalculateHoveringText(evt.click.pos);
       if(mHoveringText) {
         mFadeOut = 0.0f;
+        mConfirmation.play();
       }
       break;
     default:

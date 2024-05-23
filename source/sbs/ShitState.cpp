@@ -236,6 +236,7 @@ private:
   Sound mBuy;
   Sound mBrokeAssMfGetAJob;
   Sound mPop;
+  Sound mBreath;
 
 public:
   bool preload() override {
@@ -252,7 +253,8 @@ public:
       .nqCustom("splash.ogg", mSplash)
       .nqCustom("buy.ogg", mBuy)
       .nqCustom("broke.ogg", mBrokeAssMfGetAJob)
-      .nqCustom("pop.ogg", mPop);
+      .nqCustom("pop.ogg", mPop)
+      .nqCustom("breath.ogg", mBreath);
     mStore.nqLoad("progress", mSave);
     return true;
   }
@@ -331,6 +333,9 @@ public:
 
     mOxy -= mEffort * mConfig.oxy.drain * delta;
     if(mOxy <= 0) {
+      if(!mOuttaBreath) {
+        mBreath.play();
+      }
       mOuttaBreath = true;
       mOxy = 0;
     }
