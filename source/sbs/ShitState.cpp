@@ -235,6 +235,7 @@ private:
   Sound mSplash;
   Sound mBuy;
   Sound mBrokeAssMfGetAJob;
+  Sound mPop;
 
 public:
   bool preload() override {
@@ -250,7 +251,8 @@ public:
       .nqTexture("icons.png", mIconsTexture)
       .nqCustom("splash.ogg", mSplash)
       .nqCustom("buy.ogg", mBuy)
-      .nqCustom("broke.ogg", mBrokeAssMfGetAJob);
+      .nqCustom("broke.ogg", mBrokeAssMfGetAJob)
+      .nqCustom("pop.ogg", mPop);
     mStore.nqLoad("progress", mSave);
     return true;
   }
@@ -341,6 +343,7 @@ public:
       if(mProgress >= 1) {
         mCooldown = cCooldownValue;
         mBrickFall = 0.0f;
+        mPop.play();
         ++mSave.score;
         save();
       } else if(mProgress > 0) {
