@@ -20,4 +20,4 @@ out = "target/sbs.bndl"
 [sbs]
 exe = "sbs"
 lang = "cpp"
-libs = [ "nwge", "SDL2" ]
+libs = [ "nwge", "SDL2", "SDL2_mixer" ]

@@ -1,4 +1,5 @@
 #include "states.hpp"
+#include "audio.hpp"
 #include "save.hpp"
 #include "ui.hpp"
 #include <cmath>
@@ -229,6 +230,10 @@ private:
     resetSave();
   }};
 
+  f32 mWaterY = cWaterMinY;
+
+  Sound mSplash;
+
 public:
   bool preload() override {
     mBundle
@@ -240,7 +245,8 @@ public:
       .nqTexture("bg.png", mBgTexture)
       .nqCustom("cfg.json", mConfig)
       .nqTexture("vignette.png", mVignetteTexture)
-      .nqTexture("icons.png", mIconsTexture);
+      .nqTexture("icons.png", mIconsTexture)
+      .nqCustom("splash.ogg", mSplash);
     mStore.nqLoad("progress", mSave);
     return true;
   }
@@ -290,7 +296,10 @@ public:
       save();
     }
 
+    static bool sSplash = true;
+
     mTimer += delta;
+    mWaterY = cWaterMinY + (sinf(mTimer) + 1) * (cWaterMaxY - cWaterMinY); 
 
     if(mTimer < cFadeInTime) {
       return true;
@@ -342,10 +351,15 @@ public:
       mBrickFall = -1.0f;
       recalculateProgressDecay();
       recalculateGravity();
+      sSplash = true;
     }
 
     if(mBrickFall >= 0) {
       mBrickFall += mConfig.brickFallSpeed * delta;
+      if(mBrickFall >= mWaterY && sSplash) {
+        mSplash.play();
+        sSplash = false;
+      }
     }
     return true;
   }
@@ -383,10 +397,9 @@ public:
       {cBrickW, cBrickH},
       mBrickTexture);
 
-    f32 waterY = cWaterMinY + (sinf(mTimer) + 1) * (cWaterMaxY - cWaterMinY);
     render::color({1, 1, 1, 0.5f});
     render::rect(
-      {cWaterX, waterY, cWaterZ},
+      {cWaterX, mWaterY, cWaterZ},
       {cWaterW, cWaterH},
       mWaterTexture);
 
