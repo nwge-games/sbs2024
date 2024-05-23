@@ -234,7 +234,7 @@ private:
 
   Sound mSplash;
   Sound mBuy;
-  Sound mBrokeSound;
+  Sound mBrokeAssMfGetAJob;
 
 public:
   bool preload() override {
@@ -249,7 +249,8 @@ public:
       .nqTexture("vignette.png", mVignetteTexture)
       .nqTexture("icons.png", mIconsTexture)
       .nqCustom("splash.ogg", mSplash)
-      .nqCustom("buy.ogg", mBuy);
+      .nqCustom("buy.ogg", mBuy)
+      .nqCustom("broke.ogg", mBrokeAssMfGetAJob);
     mStore.nqLoad("progress", mSave);
     return true;
   }
@@ -272,7 +273,7 @@ public:
           mSave,
           mConfig,
           mBuy,
-          mBrokeSound,
+          mBrokeAssMfGetAJob,
           mFont,
           mIconsTexture,
         };

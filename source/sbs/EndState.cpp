@@ -12,7 +12,8 @@ class EndState: public State {
 private:
   data::Bundle mBundle;
   render::gl::Texture mTexture;
-  f32 mCountdown = 1.0f;
+  f32 mCountdown = 1.1f;
+  Sound mSound;
 
   data::Store mStore;
   Savefile mSave{};
@@ -21,7 +22,8 @@ public:
   bool preload() override {
     mBundle
       .load({"sbs.bndl"})
-      .nqTexture("michael.png", mTexture);
+      .nqTexture("michael.png", mTexture)
+      .nqCustom("michael.ogg", mSound);
     mStore.nqLoad("progress", mSave);
     return true;
   }
@@ -30,6 +32,7 @@ public:
     ++mSave.prestige;
     mSave.score = mSave.lubeTier = mSave.gravityTier = 0;
     mStore.nqSave("progress", mSave);
+    mSound.play();
     return true;
   }
 

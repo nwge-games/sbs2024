@@ -95,6 +95,7 @@ private:
       // broke ahh
       mPurchaseFloat = cInsufficientFundsFloat;
       mPurchaseFloatTimer = 0.0f;
+      mData.brokeSound.play();
       return;
     }
     mData.save.score -= item.price;
