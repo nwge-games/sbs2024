@@ -7,6 +7,7 @@ Functions for different states of the game.
 #include <nwge/state.hpp>
 #include <nwge/render/font.hpp>
 #include <nwge/render/gl/Texture.hpp>
+#include "audio.hpp"
 #include "config.hpp"
 #include "save.hpp"
 
@@ -20,6 +21,9 @@ nwge::State *getEndState();
 struct StoreData {
   Savefile &save;
   Config &config;
+
+  Sound &buySound;
+  Sound &brokeSound;
 
   nwge::render::Font &font;
   nwge::render::gl::Texture &icons;

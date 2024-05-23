@@ -114,6 +114,7 @@ private:
     }
     mPurchaseFloat = mItemHover;
     mItemHover = -1;
+    mData.buySound.play();
   }
 
 public:

@@ -233,6 +233,8 @@ private:
   f32 mWaterY = cWaterMinY;
 
   Sound mSplash;
+  Sound mBuy;
+  Sound mBrokeSound;
 
 public:
   bool preload() override {
@@ -246,7 +248,8 @@ public:
       .nqCustom("cfg.json", mConfig)
       .nqTexture("vignette.png", mVignetteTexture)
       .nqTexture("icons.png", mIconsTexture)
-      .nqCustom("splash.ogg", mSplash);
+      .nqCustom("splash.ogg", mSplash)
+      .nqCustom("buy.ogg", mBuy);
     mStore.nqLoad("progress", mSave);
     return true;
   }
@@ -268,6 +271,8 @@ public:
         StoreData data{
           mSave,
           mConfig,
+          mBuy,
+          mBrokeSound,
           mFont,
           mIconsTexture,
         };
