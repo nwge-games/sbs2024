@@ -185,17 +185,17 @@ private:
     bool load(data::RW &file) {
       ScratchArray<char> data{usize(file.size())};
       if(!file.read(data.view())) {
-        errorBox("Error", "Could not load reviews: I/O error");
+        dialog::error("Error", "Could not load reviews: I/O error");
         return false;
       }
       auto res = json::parse(data.view());
       if(res.error != json::OK) {
-        errorBox("Error", "Could not load reviews: Invalid JSON ({})",
+        dialog::error("Error", "Could not load reviews: Invalid JSON ({})",
           json::errorMessage(res.error));
         return false;
       }
       if(!res.value->isArray()) {
-        errorBox("Error", "Could not load reviews: Not an array");
+        dialog::error("Error", "Could not load reviews: Not an array");
         return false;
       }
 
@@ -204,26 +204,26 @@ private:
       for(usize i = 0; i < reviews.size(); ++i) {
         const auto &value = array[i];
         if(!value.isObject()) {
-          errorBox("Error", "Could not load review {}: Not an object",
+          dialog::error("Error", "Could not load review {}: Not an object",
             i);
           return false;
         }
         const auto &object = value.object();
         const auto *personV = object.get("person");
         if(personV == nullptr || !personV->isString()) {
-          errorBox("Error", "Could not load review {}: Invalid `person`",
+          dialog::error("Error", "Could not load review {}: Invalid `person`",
             i);
           return false;
         }
         const auto *quoteV = object.get("quote");
         if(quoteV == nullptr || !quoteV->isString()) {
-          errorBox("Error", "Could not load review {}: Invalid `quote`",
+          dialog::error("Error", "Could not load review {}: Invalid `quote`",
             i);
           return false;
         }
         const auto *ratingV = object.get("rating");
         if(ratingV == nullptr || !ratingV->isNumber()) {
-          errorBox("Error", "Could not load review {}: Invalid `rating`",
+          dialog::error("Error", "Could not load review {}: Invalid `rating`",
             i);
           return false;
         }

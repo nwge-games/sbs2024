@@ -1,5 +1,5 @@
 #include "audio.hpp"
-#include <nwge/common/err.hpp>
+#include <nwge/dialog.hpp>
 
 namespace sbs {
 
@@ -30,7 +30,7 @@ Sound::~Sound() {
 bool Sound::load(nwge::data::RW &file) {
   mChunk = Mix_LoadWAV_RW(file, SDL_FALSE);
   if(mChunk == nullptr) {
-    nwge::errorBox("Audio",
+    nwge::dialog::error("Audio",
       "Could not load sound file:\n"
       "{}",
       Mix_GetError());

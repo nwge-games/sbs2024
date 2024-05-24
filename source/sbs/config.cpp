@@ -1,6 +1,6 @@
 #include "config.hpp"
 #include <nwge/console.hpp>
-#include <nwge/common/err.hpp>
+#include <nwge/dialog.hpp>
 #include <nwge/json.hpp>
 #include <SDL2/SDL_error.h>
 
@@ -16,13 +16,13 @@ static bool loadStore(Config &out, const json::Object &root);
 bool Config::load(data::RW &file) {
   auto fileSize = file.size();
   if(fileSize <= 0) {
-    errorBox("Config", "Configuration file is invalid or empty.");
+    dialog::error("Config", "Configuration file is invalid or empty.");
     return false;
   }
 
   ScratchArray<char> raw{usize(fileSize)};
   if(!file.read(raw.view())) {
-    errorBox("Config",
+    dialog::error("Config",
       "Could not read the configuration file.\n"
       "{}",
       SDL_GetError());
@@ -31,7 +31,7 @@ bool Config::load(data::RW &file) {
 
   auto res = json::parse(raw.view());
   if(res.error != json::OK) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is not valid JSON.\n"
       "{}",
       json::errorMessage(res.error));
@@ -39,7 +39,7 @@ bool Config::load(data::RW &file) {
   }
 
   if(!res.value->isObject()) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "Not an object.");
     return false;
@@ -64,13 +64,13 @@ bool Config::load(data::RW &file) {
 
   const auto *brickFallSpeedV = root.get("brickFallSpeed");
   if(brickFallSpeedV == nullptr) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "No `brickFallSpeed` key.");
     return false;
   }
   if(!brickFallSpeedV->isNumber()) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "`brickFallSpeed` is not a number.");
     return false;
@@ -95,13 +95,13 @@ bool Config::load(data::RW &file) {
 bool loadLube(Config &out, const json::Object &root) {
   const auto *lubeV = root.get("lube");
   if(lubeV == nullptr) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "No `lube` key.");
     return false;
   }
   if(!lubeV->isObject()) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "`lube` is not a object.");
     return false;
@@ -110,13 +110,13 @@ bool loadLube(Config &out, const json::Object &root) {
 
   const auto *baseV = lubeObject.get("base");
   if(baseV == nullptr) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "No `base` in key in `lube` object.");
     return false;
   }
   if(!baseV->isNumber()) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "`base` in `lube` object is not a number.");
     return false;
@@ -125,13 +125,13 @@ bool loadLube(Config &out, const json::Object &root) {
 
   const auto *upgradeV = lubeObject.get("upgrade");
   if(upgradeV == nullptr) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "No `upgrade` in key in `lube` object.");
     return false;
   }
   if(!upgradeV->isNumber()) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "`upgrade` in `lube` object is not a number.");
     return false;
@@ -140,13 +140,13 @@ bool loadLube(Config &out, const json::Object &root) {
 
   const auto *maxTierV = lubeObject.get("maxTier");
   if(maxTierV == nullptr) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "No `maxTier` in key in `lube` object.");
     return false;
   }
   if(!maxTierV->isNumber()) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "`maxTier` in `lube` object is not a number.");
     return false;
@@ -159,13 +159,13 @@ bool loadLube(Config &out, const json::Object &root) {
 bool loadGravity(Config &out, const json::Object &root) {
   const auto *gravityV = root.get("gravity");
   if(gravityV == nullptr) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "No `gravity` key.");
     return false;
   }
   if(!gravityV->isObject()) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "`gravity` is not a object.");
     return false;
@@ -174,13 +174,13 @@ bool loadGravity(Config &out, const json::Object &root) {
 
   const auto *baseV = gravityObject.get("base");
   if(baseV == nullptr) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "No `base` in key in `gravity` object.");
     return false;
   }
   if(!baseV->isNumber()) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "`base` in `gravity` object is not a number.");
     return false;
@@ -189,13 +189,13 @@ bool loadGravity(Config &out, const json::Object &root) {
 
   const auto *upgradeV = gravityObject.get("upgrade");
   if(upgradeV == nullptr) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "No `upgrade` in key in `gravity` object.");
     return false;
   }
   if(!upgradeV->isNumber()) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "`upgrade` in `gravity` object is not a number.");
     return false;
@@ -204,13 +204,13 @@ bool loadGravity(Config &out, const json::Object &root) {
 
   const auto *thresholdV = gravityObject.get("threshold");
   if(thresholdV == nullptr) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "No `threshold` in key in `gravity` object.");
     return false;
   }
   if(!thresholdV->isNumber()) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "`threshold` in `gravity` object is not a number.");
     return false;
@@ -219,13 +219,13 @@ bool loadGravity(Config &out, const json::Object &root) {
 
   const auto *maxTierV = gravityObject.get("maxTier");
   if(maxTierV == nullptr) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "No `maxTier` in key in `gravity` object.");
     return false;
   }
   if(!maxTierV->isNumber()) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "`maxTier` in `gravity` object is not a number.");
     return false;
@@ -238,13 +238,13 @@ bool loadGravity(Config &out, const json::Object &root) {
 bool loadOxy(Config &out, const json::Object &root) {
   const auto *oxyV = root.get("oxy");
   if(oxyV == nullptr) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "No `oxy` key.");
     return false;
   }
   if(!oxyV->isObject()) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "`oxy` is not a object.");
     return false;
@@ -253,13 +253,13 @@ bool loadOxy(Config &out, const json::Object &root) {
 
   const auto *regenV = oxyObject.get("regen");
   if(regenV == nullptr) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "No `regen` in key in `oxy` object.");
     return false;
   }
   if(!regenV->isNumber()) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "`regen` in `oxy` object is not a number.");
     return false;
@@ -268,13 +268,13 @@ bool loadOxy(Config &out, const json::Object &root) {
 
   const auto *drainV = oxyObject.get("drain");
   if(drainV == nullptr) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "No `drain` in key in `oxy` object.");
     return false;
   }
   if(!drainV->isNumber()) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "`drain` in `oxy` object is not a number.");
     return false;
@@ -283,13 +283,13 @@ bool loadOxy(Config &out, const json::Object &root) {
 
   const auto *minV = oxyObject.get("min");
   if(minV == nullptr) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "No `min` in key in `oxy` object.");
     return false;
   }
   if(!minV->isNumber()) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "`min` in `oxy` object is not a number.");
     return false;
@@ -302,13 +302,13 @@ bool loadOxy(Config &out, const json::Object &root) {
 bool loadStore(Config &out, const json::Object &root) {
   const auto *storeV = root.get("store");
   if(storeV == nullptr) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "No `store` key.");
     return false;
   }
   if(!storeV->isArray()) {
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "`store` is not an array.");
     return false;
@@ -320,7 +320,7 @@ bool loadStore(Config &out, const json::Object &root) {
     auto &item = out.store[i];
     const auto &itemV = storeArray[i];
     if(!itemV.isObject()) {
-      errorBox("Config",
+      dialog::error("Config",
         "Configuration file is invalid.\n"
         "`store` element {} is not an object.",
         i);
@@ -330,7 +330,7 @@ bool loadStore(Config &out, const json::Object &root) {
 
     const auto *nameV = itemObject.get("name");
     if(nameV == nullptr || !nameV->isString()) {
-      errorBox("Config",
+      dialog::error("Config",
         "Configuration file is invalid.\n"
         "`name` of `store` element {} is not a string.",
         i);
@@ -340,7 +340,7 @@ bool loadStore(Config &out, const json::Object &root) {
 
     const auto *descV = itemObject.get("desc");
     if(descV == nullptr || !descV->isString()) {
-      errorBox("Config",
+      dialog::error("Config",
         "Configuration file is invalid.\n"
         "`desc` of `store` element {} is not a string.",
         i);
@@ -350,7 +350,7 @@ bool loadStore(Config &out, const json::Object &root) {
 
     const auto *priceV = itemObject.get("price");
     if(priceV == nullptr || !priceV->isNumber()) {
-      errorBox("Config",
+      dialog::error("Config",
         "Configuration file is invalid.\n"
         "`price` of `store` element {} is not a Number.",
         i);
@@ -362,7 +362,7 @@ bool loadStore(Config &out, const json::Object &root) {
     if(lubeTierV != nullptr) {
       item.kind = StoreItem::Lube;
       if(!lubeTierV->isNumber()) {
-        errorBox("Config",
+        dialog::error("Config",
           "Configuration file is invalid.\n"
           "`lubeTier` of `store` element {} is not a Number.",
           i);
@@ -375,7 +375,7 @@ bool loadStore(Config &out, const json::Object &root) {
     if(gravityTierV != nullptr) {
       item.kind = StoreItem::Gravity;
       if(!gravityTierV->isNumber()) {
-        errorBox("Config",
+        dialog::error("Config",
           "Configuration file is invalid.\n"
           "`gravityTier` of `store` element {} is not a Number.",
           i);
@@ -389,7 +389,7 @@ bool loadStore(Config &out, const json::Object &root) {
       item.kind = StoreItem::EndGame;
       continue;
     }
-    errorBox("Config",
+    dialog::error("Config",
       "Configuration file is invalid.\n"
       "`store` element {} does not define `lubeTier`, `gravityTier` or `endGame`.",
       i);
