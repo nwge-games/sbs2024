@@ -25,7 +25,12 @@ private:
     cBarBgClrMult = 0.1f,
     cBarTextH = 0.025f;
 
-  void renderBar(const StringView &name, glm::vec3 pos, glm::vec2 size, f32 progress, glm::vec3 color) const {
+  void renderBar(
+    const StringView &name,
+    glm::vec3 pos, glm::vec2 size, f32 progress,
+    glm::vec3 color, s16 icon,
+    bool warning = false
+  ) const {
     render::color(color);
     render::setScissorEnabled();
     render::scissor({pos.x, pos.y}, {size.x, size.y * progress});
@@ -42,11 +47,29 @@ private:
     );
 
     auto measure = mFont.measure(name, cBarTextH);
-    float textX =  size.x / 2 - measure.x / 2 + pos.x;
+    f32 textX = size.x / 2 - measure.x / 2 + pos.x - 3*cBarTextH/4;
+    f32 textY = pos.y + size.y + cPad;
+    f32 textZ = pos.z - 2*cBarFillOff;
     render::color();
     mFont.draw(name,
-      {textX, pos.y + size.y + cPad, pos.z - 2*cBarFillOff},
+      {textX + cBarTextH, textY, textZ},
       cBarTextH);
+    render::rect(
+      {textX, textY, textZ},
+      {cBarTextH, cBarTextH},
+      mIconsTexture,
+      {
+        {f32(icon % 2) * cIconTexUnit, f32(s16(icon / 2)) * cIconTexUnit},
+        {cIconTexUnit, cIconTexUnit}});
+    if(warning) {
+      render::rect(
+        {textX, textY, textZ - cBarFillOff},
+        {cBarTextH, cBarTextH},
+        mIconsTexture,
+        {
+          {0, 0.5f},
+          {1.0f/8.0f, 1.0f/8.0f}});
+    }
   }
 
   f32 mEffort = 0.0f;
@@ -167,10 +190,11 @@ private:
     cStoreIconX = cTextX + 0.2f,
     cStoreIconY = cTextY,
     cStoreIconZ = 0.52f,
-    cStoreIconTexX = 0.0f/1.0f,
-    cStoreIconTexY = 0.0f/1.0f,
-    cStoreIconTexW = 1.0f/1.0f,
-    cStoreIconTexH = 1.0f/1.0f;
+    cIconTexUnit = 1.0f/4.0f,
+    cStoreIconTexX = 0.0f*cIconTexUnit,
+    cStoreIconTexY = 0.0f*cIconTexUnit,
+    cStoreIconTexW = cIconTexUnit,
+    cStoreIconTexH = cIconTexUnit;
 
   static constexpr glm::vec3
     cHoverColor{1, 1, 0};
@@ -387,13 +411,16 @@ public:
       {cEffortBarX, cEffortBarY, cEffortBarZ},
       {cEffortBarW, cEffortBarH},
       mEffort,
-      cEffortBarColor);
+      cEffortBarColor,
+      3);
     renderBar(
       "Oxy",
       {cOxyBarX, cOxyBarY, cOxyBarZ},
       {cOxyBarW, cOxyBarH},
       mOxy,
-      mOuttaBreath ? cOxyBarBadColor : cOxyBarColor);
+      mOuttaBreath ? cOxyBarBadColor : cOxyBarColor,
+      2,
+      mOuttaBreath);
     render::color();
 
     if(mCooldown > 0 && mBrickFall < 0) {

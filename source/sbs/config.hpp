@@ -22,7 +22,8 @@ struct StoreItem {
   } kind = None;
   s16 argument = 0;
 
-  s32 price = 1;
+  s16 price = 1;
+  s16 icon = 0;
   nwge::String<> name;
   nwge::String<> desc;
 };

@@ -356,7 +356,17 @@ bool loadStore(Config &out, const json::Object &root) {
         i);
       return false;
     }
-    item.price = static_cast<s32>(priceV->number());
+    item.price = static_cast<s16>(priceV->number());
+
+    const auto *iconV = itemObject.get("icon");
+    if(iconV == nullptr || !iconV->isNumber()) {
+      dialog::error("Config",
+        "Configuration file is invalid.\n"
+        "`icon` of `store` element {} is not a Number.",
+        i);
+      return false;
+    }
+    item.icon = static_cast<s16>(iconV->number());
 
     const auto *lubeTierV = itemObject.get("lubeTier");
     if(lubeTierV != nullptr) {

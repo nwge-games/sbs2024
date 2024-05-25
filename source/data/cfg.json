@@ -21,30 +21,35 @@
       "name": "Chinese Lube",
       "desc": "Obtained from an 8-legged chinese man.",
       "price": 10,
+      "icon": 1,
       "lubeTier": 1
     },
     {
       "name": "Super Lube",
       "desc": "Industrial-grade poop chute sloppifier.",
       "price": 15,
+      "icon": 0,
       "lubeTier": 2
     },
     {
       "name": "Gravity Intensifier",
       "desc": "Weird device that pulls things towards it.",
       "price": 25,
+      "icon": 2,
       "gravityTier": 1
     },
     {
       "name": "Mini Black Hole",
       "desc": "Pulls shit out really well.",
       "price": 35,
+      "icon": 3,
       "gravityTier": 2
     },
     {
       "name": "Supermassive Black Hole",
       "desc": "It sucks.",
       "price": 50,
+      "icon": 3,
       "endGame": true
     }
   ]

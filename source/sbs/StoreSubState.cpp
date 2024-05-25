@@ -35,18 +35,18 @@ private:
     cItemTextColor = cWhite,
     cItemHoverBgColor = cGrayBright,
     cItemOwnedBgColor = cGrayDark,
+    cItemIconHoverColor = {1.5, 1.5, 1.5},
     cItemOwnedTextColor = cGrayMed,
     cInsufficientFundsColor = cRed,
     cPurchaseFloatColor = cGreen;
   static constexpr f32
-    cWindowW = 0.5f,
+    cWindowW = 0.7f,
     cWindowH = 0.9f,
     cWindowX = (1.0f - cWindowW) /2,
     cWindowY = (1.0f - cWindowH) / 2,
     cWindowBgZ = 0.39f;
 
   static constexpr f32
-    
     cTitleTextY = cWindowY + cPad,
     cTitleTextH = 0.08f,
     cTitleTextZ = 0.38f,
@@ -62,8 +62,19 @@ private:
     cItemZ = 0.036f,
     cItemNameTextH = 0.04f,
     cItemDescTextH = 0.025f,
-    cItemTextX = cItemX + cPad,
-    cItemTextZ = 0.035f;
+    cItemTextZ = 0.035f,
+    cStoreIconH = cTitleTextH,
+    cStoreIconW = cStoreIconH,
+    cStoreIconY = cTitleTextY,
+    cStoreIconZ = cTitleTextZ,
+    cStoreIconTexX = 0.0f/4.0f,
+    cStoreIconTexY = 0.0f/4.0f,
+    cStoreIconTexW = 1.0f/4.0f,
+    cStoreIconTexH = 1.0f/4.0f,
+    cItemIconX = cItemX+cPad,
+    cItemIconH = cItemNameTextH+cPad+cItemDescTextH,
+    cItemIconW = cItemIconH,
+    cItemTextX = cItemIconX+cItemIconH+cPad;
 
   s32 mItemHover = -1;
 
@@ -189,6 +200,20 @@ public:
 
       if(owned) {
         render::color(cItemOwnedTextColor);
+      } else if(mItemHover == s32(i)) {
+        render::color(cItemIconHoverColor);
+      } else {
+        render::color(cItemTextColor);
+      }
+      render::rect(
+        {cItemIconX, baseY+cPad, cItemTextZ},
+        {cItemIconW, cItemIconH},
+        mData.icons,
+        {
+          {0.5f + f32(item.icon % 2) / 4.0f, f32(item.icon / 2) / 4.0f},
+          {1.0f/4.0f, 1.0f/4.0f}});
+      if(owned) {
+        render::color(cItemOwnedTextColor);
       } else {
         render::color(cItemTextColor);
       }
@@ -213,9 +238,17 @@ public:
       {cWindowW, cWindowH});
 
     auto measure = mData.font.measure("Store", cTitleTextH);
-    f32 textX = 0.5f - measure.x / 2.0f;
+    f32 textX = 0.5f - measure.x / 2 - cStoreIconW / 2;
     render::color();
-    mData.font.draw("Store", {textX, cTitleTextY, cTitleTextZ}, cTitleTextH);
+    mData.font.draw("Store", {textX+cStoreIconW, cTitleTextY, cTitleTextZ}, cTitleTextH);
+    render::rect(
+      {textX, cStoreIconY, cStoreIconZ},
+      {cStoreIconW, cStoreIconH},
+      mData.icons,
+      {
+        {cStoreIconTexX, cStoreIconTexY},
+        {cStoreIconTexW, cStoreIconTexH}
+      });
 
     render::color(cBgColor);
     render::rect({0, 0, cBgZ}, {1, 1});

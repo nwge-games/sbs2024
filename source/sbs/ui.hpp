@@ -28,6 +28,7 @@ static constexpr glm::vec3
   cBlue{0, 0, 1},
   cMagenta{1, 0, 1},
   cCyan{0, 1, 1},
-  cYellow{1, 1, 0};
+  cYellow{1, 1, 0},
+  cLightYellow{1, 1, 0.75};
 
 }
