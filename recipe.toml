@@ -21,3 +21,8 @@ out = "target/sbs.bndl"
 exe = "sbs"
 lang = "cpp"
 libs = [ "nwge", "SDL2", "SDL2_mixer" ]
+
+[void]
+exe = "void"
+lang = "cpp"
+libs = [ "nwge" ]
