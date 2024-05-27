@@ -45,7 +45,18 @@ struct Config {
     f32 drain;
     f32 min;
   } oxy;
-  f32 brickFallSpeed;
+  struct Toilet {
+    f32 xPos;
+    f32 yPos;
+    f32 size;
+  } toilet;
+  struct Brick {
+    f32 xPos;
+    f32 startY;
+    f32 endY;
+    f32 fallSpeed;
+    f32 size;
+  } brick;
   nwge::Array<StoreItem> store;
 
   bool load(nwge::data::RW &file);

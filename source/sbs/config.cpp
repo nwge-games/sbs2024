@@ -12,6 +12,8 @@ static bool loadLube(Config &out, const json::Object &root);
 static bool loadGravity(Config &out, const json::Object &root);
 static bool loadOxy(Config &out, const json::Object &root);
 static bool loadStore(Config &out, const json::Object &root);
+static bool loadToilet(Config &out, const json::Object &root);
+static bool loadBrick(Config &out, const json::Object &root);
 
 bool Config::load(data::RW &file) {
   auto fileSize = file.size();
@@ -62,20 +64,13 @@ bool Config::load(data::RW &file) {
     return false;
   }
 
-  const auto *brickFallSpeedV = root.get("brickFallSpeed");
-  if(brickFallSpeedV == nullptr) {
-    dialog::error("Config",
-      "Configuration file is invalid.\n"
-      "No `brickFallSpeed` key.");
+  if(!loadToilet(*this, root)) {
     return false;
   }
-  if(!brickFallSpeedV->isNumber()) {
-    dialog::error("Config",
-      "Configuration file is invalid.\n"
-      "`brickFallSpeed` is not a number.");
+
+  if(!loadBrick(*this, root)) {
     return false;
   }
-  brickFallSpeed = static_cast<f32>(brickFallSpeedV->number());
 
   console::note("Loaded config:");
   console::print("  Lube:");
@@ -87,7 +82,15 @@ bool Config::load(data::RW &file) {
   console::print("    Upgrade: {}", gravity.upgrade);
   console::print("    Threshold: {}", gravity.threshold);
   console::print("    Max Tier: {}", gravity.maxTier);
-  console::print("  Brick Fall Speed: {}", brickFallSpeed);
+  console::print("  Toilet:");
+  console::print("    X: {}", toilet.xPos);
+  console::print("    Y: {}", toilet.yPos);
+  console::print("    Size: {}", toilet.size);
+  console::print("  Brick:");
+  console::print("    Start Y: {}", brick.startY);
+  console::print("    End Y: {}", brick.endY);
+  console::print("    Fall Speed: {}", brick.fallSpeed);
+  console::print("    Size: {}", brick.size);
 
   return true;
 }
@@ -405,6 +408,164 @@ bool loadStore(Config &out, const json::Object &root) {
       i);
     return false;
   }
+  return true;
+}
+
+bool loadToilet(Config &out, const json::Object &root) {
+  const auto *toiletV = root.get("toilet");
+  if(toiletV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `toilet` key.");
+    return false;
+  }
+  if(!toiletV->isObject()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`toilet` is not a object.");
+    return false;
+  }
+  const auto &toiletObject = toiletV->object();
+
+  const auto *xPosV = toiletObject.get("xPos");
+  if(xPosV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `xPos` in key in `toilet` object.");
+    return false;
+  }
+  if(!xPosV->isNumber()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`xPos` in `toilet` object is not a number.");
+    return false;
+  }
+  out.toilet.xPos = static_cast<f32>(xPosV->number());
+
+  const auto *yPosV = toiletObject.get("yPos");
+  if(yPosV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `yPos` in key in `toilet` object.");
+    return false;
+  }
+  if(!yPosV->isNumber()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`yPos` in `toilet` object is not a number.");
+    return false;
+  }
+  out.toilet.yPos = static_cast<f32>(yPosV->number());
+
+  const auto *sizeV = toiletObject.get("size");
+  if(sizeV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `size` in key in `toilet` object.");
+    return false;
+  }
+  if(!sizeV->isNumber()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`size` in `toilet` object is not a number.");
+    return false;
+  }
+  out.toilet.size = static_cast<f32>(sizeV->number());
+
+  return true;
+}
+
+bool loadBrick(Config &out, const json::Object &root) {
+  const auto *brickV = root.get("brick");
+  if(brickV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `brick` key.");
+    return false;
+  }
+  if(!brickV->isObject()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`brick` is not a object.");
+    return false;
+  }
+  const auto &brickObject = brickV->object();
+
+  const auto *xPosV = brickObject.get("xPos");
+  if(xPosV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `xPos` in key in `brick` object.");
+    return false;
+  }
+  if(!xPosV->isNumber()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`xPos` in `brick` object is not a number.");
+    return false;
+  }
+  out.brick.xPos = static_cast<f32>(xPosV->number());
+
+  const auto *startYV = brickObject.get("startY");
+  if(startYV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `startY` in key in `brick` object.");
+    return false;
+  }
+  if(!startYV->isNumber()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`startY` in `brick` object is not a number.");
+    return false;
+  }
+  out.brick.startY = static_cast<f32>(startYV->number());
+
+  const auto *endYV = brickObject.get("endY");
+  if(endYV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `endY` in key in `brick` object.");
+    return false;
+  }
+  if(!endYV->isNumber()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`endY` in `brick` object is not a number.");
+    return false;
+  }
+  out.brick.endY = static_cast<f32>(endYV->number());
+
+  const auto *fallSpeedV = brickObject.get("fallSpeed");
+  if(fallSpeedV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `fallSpeed` in key in `brick` object.");
+    return false;
+  }
+  if(!fallSpeedV->isNumber()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`fallSpeed` in `brick` object is not a number.");
+    return false;
+  }
+  out.brick.fallSpeed = static_cast<f32>(fallSpeedV->number());
+
+  const auto *sizeV = brickObject.get("size");
+  if(sizeV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `size` in key in `brick` object.");
+    return false;
+  }
+  if(!sizeV->isNumber()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`size` in `brick` object is not a number.");
+    return false;
+  }
+  out.brick.size = static_cast<f32>(sizeV->number());
+
   return true;
 }
 

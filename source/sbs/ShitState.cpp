@@ -8,6 +8,7 @@
 #include <nwge/data/store.hpp>
 #include <nwge/render/draw.hpp>
 #include <nwge/render/gl/Texture.hpp>
+#include <nwge/render/mat.hpp>
 #include <nwge/render/window.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -128,12 +129,9 @@ private:
 
   static constexpr f32
     cBrickX = 0.5f,
-    cBrickBeginY = 0.5f,
-    cBrickPushEndY = 0.6f,
     cBrickFallEndY = 1.0f,
-    cBrickW = 0.04f,
-    cBrickH = 0.08f,
     cBrickZ = 0.55f,
+    cToiletZ = 0.551f,
     cTextH = 0.05f,
     cTextX = 0.5f,
     cTextY = 0.075f,
@@ -262,6 +260,8 @@ private:
   Sound mPop;
   Sound mBreath;
 
+  render::gl::Texture mToiletTexture;
+
 public:
   bool preload() override {
     mBundle
@@ -278,7 +278,8 @@ public:
       .nqCustom("buy.ogg", mBuy)
       .nqCustom("broke.ogg", mBrokeAssMfGetAJob)
       .nqCustom("pop.ogg", mPop)
-      .nqCustom("breath.ogg", mBreath);
+      .nqCustom("breath.ogg", mBreath)
+      .nqTexture("toilet.png", mToiletTexture);
     mStore.nqLoad("progress", mSave);
     return true;
   }
@@ -393,7 +394,7 @@ public:
     }
 
     if(mBrickFall >= 0) {
-      mBrickFall += mConfig.brickFallSpeed * delta;
+      mBrickFall += mConfig.brick.fallSpeed * delta;
       if(mBrickFall >= mWaterY && sSplash) {
         mSplash.play();
         sSplash = false;
@@ -429,14 +430,23 @@ public:
 
     f32 brickY;
     if(mCooldown == 0.0) {
-      brickY = cBrickBeginY + mProgress * (cBrickPushEndY - cBrickBeginY);
+      brickY = mConfig.brick.startY + mProgress * (mConfig.brick.endY - mConfig.brick.startY);
     } else {
-      brickY = cBrickPushEndY + mBrickFall * (cBrickFallEndY - cBrickPushEndY);
+      brickY = mConfig.brick.endY + mBrickFall * (cBrickFallEndY - mConfig.brick.endY);
     }
+    render::mat::push();
+    render::mat::translate({mConfig.brick.xPos, brickY, cBrickZ});
+    render::mat::rotate(M_PI/2, {0, 0, 1});
     render::rect(
-      {cBrickX, brickY, cBrickZ},
-      {cBrickW, cBrickH},
+      {0, 0, 0},
+      {2*mConfig.brick.size, mConfig.brick.size},
       mBrickTexture);
+    render::mat::pop();
+
+    render::rect(
+      {mConfig.toilet.xPos, mConfig.toilet.yPos, cToiletZ},
+      {mConfig.toilet.size, mConfig.toilet.size},
+      mToiletTexture);
 
     render::color({1, 1, 1, 0.5f});
     render::rect(

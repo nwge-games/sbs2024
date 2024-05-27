@@ -1,10 +1,20 @@
 #include <nwge/engine.hpp>
+#include <nwge/cli/cli.h>
 #include "states.hpp"
 #include "audio.hpp"
 
-s32 main([[maybe_unused]] s32 argc, [[maybe_unused]] CStr *argv) {
+s32 main(s32 argc, CStr *argv) {
+  nwge::cli::parse(argc, argv);
+
+  nwge::State *statePtr;
+  if(nwge::cli::flag("game")) {
+    statePtr = sbs::getShitState();
+  } else {
+    statePtr = sbs::getIntroState();
+  }
+
   sbs::initAudio();
-  nwge::startPtr(sbs::getIntroState(), {
+  nwge::startPtr(statePtr, {
     .appName = "Shitting Bricks Simulator 2024",
     .windowAspectRatio = {1, 1},
   });

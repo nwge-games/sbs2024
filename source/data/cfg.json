@@ -15,7 +15,18 @@
     "drain": 0.65,
     "min": 0.1
   },
-  "brickFallSpeed": 3.0,
+  "toilet": {
+    "xPos": 0.0,
+    "yPos": 0.0,
+    "size": 1.0
+  },
+  "brick": {
+    "xPos": 0.65,
+    "startY": 0.14125,
+    "endY": 0.34125,
+    "fallSpeed": 3.0,
+    "size": 0.1
+  },
   "store": [
     {
       "name": "Chinese Lube",
