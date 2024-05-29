@@ -41,7 +41,7 @@ private:
     render::color(color * cBarBgClrMult);
     render::rect(pos, size);
 
-    render::color(cGrayMedDark);
+    render::color(cWindowBgColor);
     render::rect(
       {pos.x - cPad, pos.y - cPad, pos.z + cBarFillOff},
       {size.x + 2*cPad, size.y + 3*cPad + cBarTextH}
@@ -51,8 +51,7 @@ private:
     f32 textX = size.x / 2 - measure.x / 2 + pos.x - 3*cBarTextH/4;
     f32 textY = pos.y + size.y + cPad;
     f32 textZ = pos.z - 2*cBarFillOff;
-    render::color();
-    mFont.draw(name,
+    drawTextWithShadow(mFont, name,
       {textX + cBarTextH, textY, textZ},
       cBarTextH);
     render::rect(
@@ -264,6 +263,66 @@ private:
 
   render::gl::Texture mToiletTexture, mToiletFTexture;
 
+  void renderBrick() const {
+    f32 brickY;
+    if(mCooldown == 0.0) {
+      brickY = mConfig.brick.startY + mProgress * (mConfig.brick.endY - mConfig.brick.startY);
+    } else {
+      brickY = mConfig.brick.endY + mBrickFall * (cBrickFallEndY - mConfig.brick.endY);
+    }
+    render::mat::push();
+    render::mat::translate({mConfig.brick.xPos, brickY, cBrickZ});
+    render::mat::rotate(M_PI/2, {0, 0, 1});
+    render::rect(
+      {0, 0, 0},
+      {2*mConfig.brick.size, mConfig.brick.size},
+      mBrickTexture);
+    render::mat::pop();
+  }
+
+  void renderToilet() const {
+    render::rect(
+      {mConfig.toilet.xPos, mConfig.toilet.yPos, cToiletZ},
+      {mConfig.toilet.size, mConfig.toilet.size},
+      mToiletTexture);
+
+    render::setScissorEnabled();
+    render::scissor(
+      {mConfig.water.scissorX, mConfig.water.scissorY},
+      {mConfig.water.scissorW, mConfig.water.scissorH});
+    render::color({1, 1, 1, 0.5f});
+    render::rect(
+      {mWaterX, mWaterY, cWaterZ},
+      {mConfig.water.width, mConfig.water.height},
+      mWaterTexture);
+    render::setScissorEnabled(false);
+
+    render::color();
+    render::rect(
+      {mConfig.toilet.xPos, mConfig.toilet.yPos, cToiletFZ},
+      {mConfig.toilet.size, mConfig.toilet.size},
+      mToiletFTexture);
+  }
+
+  void renderBars() const {
+    renderBar(
+      "Effort",
+      {cEffortBarX, cEffortBarY, cEffortBarZ},
+      {cEffortBarW, cEffortBarH},
+      mEffort,
+      cEffortBarColor,
+      3);
+    renderBar(
+      "Oxy",
+      {cOxyBarX, cOxyBarY, cOxyBarZ},
+      {cOxyBarW, cOxyBarH},
+      mOxy,
+      mOuttaBreath ? cOxyBarBadColor : cOxyBarColor,
+      2,
+      mOuttaBreath);
+    render::color();
+  }
+
 public:
   bool preload() override {
     mBundle
@@ -411,68 +470,17 @@ public:
     render::color();
     render::rect({0, 0, cBgZ}, {1, 1}, mBgTexture);
 
-    renderBar(
-      "Effort",
-      {cEffortBarX, cEffortBarY, cEffortBarZ},
-      {cEffortBarW, cEffortBarH},
-      mEffort,
-      cEffortBarColor,
-      3);
-    renderBar(
-      "Oxy",
-      {cOxyBarX, cOxyBarY, cOxyBarZ},
-      {cOxyBarW, cOxyBarH},
-      mOxy,
-      mOuttaBreath ? cOxyBarBadColor : cOxyBarColor,
-      2,
-      mOuttaBreath);
-    render::color();
 
-    if(mCooldown > 0 && mBrickFall < 0) {
-      return;
+    if(mCooldown <= 0 || mBrickFall >= 0) {
+      renderBrick();
     }
 
-    f32 brickY;
-    if(mCooldown == 0.0) {
-      brickY = mConfig.brick.startY + mProgress * (mConfig.brick.endY - mConfig.brick.startY);
-    } else {
-      brickY = mConfig.brick.endY + mBrickFall * (cBrickFallEndY - mConfig.brick.endY);
-    }
-    render::mat::push();
-    render::mat::translate({mConfig.brick.xPos, brickY, cBrickZ});
-    render::mat::rotate(M_PI/2, {0, 0, 1});
-    render::rect(
-      {0, 0, 0},
-      {2*mConfig.brick.size, mConfig.brick.size},
-      mBrickTexture);
-    render::mat::pop();
+    renderToilet();
+    renderBars();
 
-    render::rect(
-      {mConfig.toilet.xPos, mConfig.toilet.yPos, cToiletZ},
-      {mConfig.toilet.size, mConfig.toilet.size},
-      mToiletTexture);
-
-    render::setScissorEnabled();
-    render::scissor(
-      {mConfig.water.scissorX, mConfig.water.scissorY},
-      {mConfig.water.scissorW, mConfig.water.scissorH});
-    render::color({1, 1, 1, 0.5f});
-    render::rect(
-      {mWaterX, mWaterY, cWaterZ},
-      {mConfig.water.width, mConfig.water.height},
-      mWaterTexture);
-    render::setScissorEnabled(false);
-
-    render::color();
-    render::rect(
-      {mConfig.toilet.xPos, mConfig.toilet.yPos, cToiletFZ},
-      {mConfig.toilet.size, mConfig.toilet.size},
-      mToiletFTexture);
-
-    render::color();
     auto measure = mFont.measure(mScoreString, cTextH);
     f32 textX = cTextX - measure.x / 2;
-    mFont.draw(mScoreString, {textX, cTextY, cTextZ}, cTextH);
+    drawTextWithShadow(mFont, mScoreString, {textX, cTextY, cTextZ}, cTextH);
 
     if(mHoveringStoreIcon) {
       render::color(cHoverColor);

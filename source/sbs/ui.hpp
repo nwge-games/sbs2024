@@ -7,13 +7,16 @@ Common UI definitions
 */
 
 #include <nwge/common/def.h>
-#include <nwge/glm/glm.hpp>
+#include <nwge/render/draw.hpp>
+#include <nwge/render/font.hpp>
 
 namespace sbs {
 
 [[maybe_unused]]
 static constexpr f32
-  cPad = 0.01f;
+  cPad = 0.01f,
+  cTextShadowPosOff = 1.0f/16.0f,
+  cTextShadowZOff = 0.0005f;
 
 [[maybe_unused]]
 static constexpr glm::vec3
@@ -31,4 +34,21 @@ static constexpr glm::vec3
   cYellow{1, 1, 0},
   cLightYellow{1, 1, 0.75};
 
+[[maybe_unused]]
+static constexpr glm::vec4
+  cWindowBgColor{0, 0, 0, 0.6f};
+
+constexpr inline void drawTextWithShadow(
+  const nwge::render::Font &font,
+  const nwge::StringView &text,
+  glm::vec3 pos, f32 height,
+  glm::vec4 color = {1, 1, 1, 1}
+) {
+  nwge::render::color(cBlack);
+  f32 off = height * cTextShadowPosOff;
+  font.draw(text, {pos.x + off, pos.y + off, pos.z + cTextShadowZOff}, height);
+  nwge::render::color(color);
+  font.draw(text, pos, height);
 }
+
+} // namespace sbs

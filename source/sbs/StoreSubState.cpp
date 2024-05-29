@@ -30,7 +30,6 @@ private:
   static constexpr glm::vec4 cBgColor{0, 0, 0, 0.5};
 
   static constexpr glm::vec3
-    cWindowBgColor = cGrayMedDark,
     cItemBgColor = cGrayMed,
     cItemTextColor = cWhite,
     cItemHoverBgColor = cGrayBright,
@@ -177,6 +176,9 @@ public:
   }
 
   void render() const override {
+    render::color(cBgColor);
+    render::rect({0, 0, cBgZ}, {1, 1});
+
     static constexpr usize cTextBufSz = 100;
     std::array<char, cTextBufSz> textBuf{};
     bool owned;
@@ -217,15 +219,21 @@ public:
       } else {
         render::color(cItemTextColor);
       }
-      mData.font.draw(item.name, {cItemTextX, baseY + cNameOff, cItemTextZ}, cItemNameTextH);
-      mData.font.draw(item.desc, {cItemTextX, baseY + cDescOff, cItemTextZ}, cItemDescTextH);
+      drawTextWithShadow(mData.font,
+        item.name,
+        {cItemTextX, baseY + cNameOff, cItemTextZ},
+        cItemNameTextH);
+      drawTextWithShadow(mData.font,
+        item.desc,
+        {cItemTextX, baseY + cDescOff, cItemTextZ},
+        cItemDescTextH);
       if(owned) {
-        mData.font.draw("Owned",
+        drawTextWithShadow(mData.font, "Owned",
           {cItemTextX, baseY + cPriceOff, cItemTextZ},
           cItemNameTextH);
       } else {
         int len = snprintf(textBuf.data(), cTextBufSz, "Price: %d", item.price);
-        mData.font.draw(
+        drawTextWithShadow(mData.font, 
           {textBuf.data(), usize(len)},
           {cItemTextX, baseY + cPriceOff, cItemTextZ},
           cItemNameTextH);
@@ -239,8 +247,10 @@ public:
 
     auto measure = mData.font.measure("Store", cTitleTextH);
     f32 textX = 0.5f - measure.x / 2 - cStoreIconW / 2;
-    render::color();
-    mData.font.draw("Store", {textX+cStoreIconW, cTitleTextY, cTitleTextZ}, cTitleTextH);
+    drawTextWithShadow(mData.font,
+      "Store",
+      {textX+cStoreIconW, cTitleTextY, cTitleTextZ},
+      cTitleTextH);
     render::rect(
       {textX, cStoreIconY, cStoreIconZ},
       {cStoreIconW, cStoreIconH},
@@ -250,8 +260,7 @@ public:
         {cStoreIconTexW, cStoreIconTexH}
       });
 
-    render::color(cBgColor);
-    render::rect({0, 0, cBgZ}, {1, 1});
+    glm::vec4 color;
 
     if(mPurchaseFloat != cNoPurchaseFloat) {
       f32 alpha = mPurchaseFloatTimer / cPurchaseFloatLifetime;
@@ -259,23 +268,23 @@ public:
       pos.y -= alpha * cPurchaseFloatDistance;
       int len;
       if(mPurchaseFloat == cInsufficientFundsFloat) {
-        render::color({cInsufficientFundsColor, 1.0f - alpha});
+        color = {cInsufficientFundsColor, 1.0f - alpha};
         len = snprintf(textBuf.data(), cTextBufSz,
           "Insufficient funds");
       } else if(mPurchaseFloat == cAlreadyOwnedFloat) {
-        render::color({cInsufficientFundsColor, 1.0f - alpha});
+        color = {cInsufficientFundsColor, 1.0f - alpha};
         len = snprintf(textBuf.data(), cTextBufSz,
           "Already owned");
       } else {
         const auto &item = mData.config.store[mPurchaseFloat];
-        render::color({cPurchaseFloatColor, 1.0f - alpha});
+        color = {cPurchaseFloatColor, 1.0f - alpha};
         len = snprintf(textBuf.data(), cTextBufSz,
           "+%*.*s",
           s32(item.name.size()), s32(item.name.size()), item.name.begin());
       }
-      mData.font.draw(
+      drawTextWithShadow(mData.font,
         {textBuf.data(), usize(len)},
-        pos, cPurchaseFloatH);
+        pos, cPurchaseFloatH, color);
     }
   }
 };
