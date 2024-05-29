@@ -13,7 +13,8 @@ Functions for different states of the game.
 
 namespace sbs {
 
-nwge::State *getIntroState();
+nwge::State *getWarningState();
+nwge::State *getIntroState(nwge::render::gl::Texture &&logoTexture);
 nwge::State *getMenuState();
 nwge::State *getShitState();
 nwge::State *getEndState();

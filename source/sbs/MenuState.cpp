@@ -163,11 +163,11 @@ private:
     cVerZ = cCopyrightZ,
     cVerH = cCopyrightH;
 
-  static constexpr glm::vec3
-    cTextBgClr{0.5, 0.5, 0.5},
-    cHoverTextBgClr{0.75, 0.75, 0.75},
-    cTextColor{1, 1, 1},
-    cHoverTextColor{1, 1, 1};
+  static constexpr glm::vec4
+    cTextBgClr{0, 0, 0, 0.6},
+    cHoverTextBgClr{0.75, 0.75, 0.75, 1},
+    cTextColor{1, 1, 1, 1},
+    cHoverTextColor{1, 1, 1, 1};
 
   bool mHoveringText = false;
 
@@ -410,6 +410,10 @@ public:
     render::color();
     render::rect({0, 0, cVignetteZ}, {1, 1}, mVignetteTexture);
 
+    render::color({1, 0, 0});
+    mFont.draw("If you leak this build we will leak your internal organs",
+      {cCopyrightX, cCopyrightY - 2*cCopyrightH, cCopyrightZ}, cCopyrightH);
+    render::color();
     mFont.draw("Copyright (c) qeaml & domi9 2024",
       {cCopyrightX, cCopyrightY, cCopyrightZ}, cCopyrightH);
     measure = mFont.measure(SBS_VER_STR, cVerH);

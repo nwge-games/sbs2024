@@ -11,7 +11,6 @@ namespace sbs {
 
 class IntroState: public State {
 private:
-  data::Bundle mBundle;
   render::gl::Texture mLogo;
 
   f32 mFadeIn = 0.0f;
@@ -31,12 +30,9 @@ private:
   static constexpr glm::vec2 cLogoSize{cLogoSide, cLogoSide};
 
 public:
-  bool preload() override {
-    mBundle
-      .load({"sbs.bndl"})
-      .nqTexture("logo1.png", mLogo);
-    return true;
-  }
+  IntroState(render::gl::Texture &&logoTexture)
+    : mLogo(std::move(logoTexture))
+  {}
 
   bool tick(f32 delta) override {
     if(mFadeIn < cFadeInDur) {
@@ -68,8 +64,8 @@ public:
   }
 };
 
-State *getIntroState() {
-  return new IntroState;
+State *getIntroState(render::gl::Texture &&logoTexture) {
+  return new IntroState(std::move(logoTexture));
 }
 
 } // namespace sbs
