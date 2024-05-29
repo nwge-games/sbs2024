@@ -14,9 +14,9 @@ Functions for different states of the game.
 namespace sbs {
 
 nwge::State *getWarningState();
-nwge::State *getIntroState(nwge::render::gl::Texture &&logoTexture);
-nwge::State *getMenuState();
-nwge::State *getShitState();
+nwge::State *getIntroState(nwge::render::gl::Texture &&logoTexture, Sound &&music);
+nwge::State *getMenuState(Sound &&music);
+nwge::State *getShitState(Sound &&music);
 nwge::State *getEndState();
 
 struct StoreData {

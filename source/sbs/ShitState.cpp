@@ -323,7 +323,13 @@ private:
     render::color();
   }
 
+  Sound mMusic;
+
 public:
+  ShitState(Sound &&music)
+    : mMusic(std::move(music))
+  {}
+
   bool preload() override {
     mBundle
       .load({"sbs.bndl"})
@@ -504,8 +510,8 @@ public:
   }
 };
 
-State *getShitState() {
-  return new ShitState;
+State *getShitState(Sound &&music) {
+  return new ShitState(std::move(music));
 }
 
 } // namespace sbs

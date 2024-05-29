@@ -29,10 +29,17 @@ private:
   static constexpr glm::vec3 cLogoPos{cLogoOff, cLogoOff, cLogoZ};
   static constexpr glm::vec2 cLogoSize{cLogoSide, cLogoSide};
 
+  Sound mMusic;
+
 public:
-  IntroState(render::gl::Texture &&logoTexture)
-    : mLogo(std::move(logoTexture))
+  IntroState(render::gl::Texture &&logoTexture, Sound &&music)
+    : mLogo(std::move(logoTexture)), mMusic(std::move(music)) 
   {}
+
+  bool init() override {
+    mMusic.play();
+    return true;
+  }
 
   bool tick(f32 delta) override {
     if(mFadeIn < cFadeInDur) {
@@ -47,7 +54,7 @@ public:
       mFadeOut += delta;
       return true;
     }
-    swapStatePtr(getMenuState());
+    swapStatePtr(getMenuState(std::move(mMusic)));
     return true;
   }
 
@@ -64,8 +71,8 @@ public:
   }
 };
 
-State *getIntroState(render::gl::Texture &&logoTexture) {
-  return new IntroState(std::move(logoTexture));
+State *getIntroState(render::gl::Texture &&logoTexture, Sound &&music) {
+  return new IntroState(std::move(logoTexture), std::move(music));
 }
 
 } // namespace sbs

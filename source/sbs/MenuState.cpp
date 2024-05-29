@@ -329,8 +329,13 @@ private:
   render::gl::Texture mVignetteTexture;
 
   Sound mConfirmation;
+  Sound mMusic;
 
 public:
+  MenuState(Sound &&music)
+    : mMusic(std::move(music))
+  {}
+
   bool preload() override {
     mBundle
       .load({"sbs.bndl"})
@@ -338,7 +343,8 @@ public:
       .nqTexture("brick.png", mBrickTexture)
       .nqFont("GrapeSoda.cfn", mFont)
       .nqCustom("reviews.json", mReviewManager)
-      .nqTexture("vignette.png", mVignetteTexture);
+      .nqTexture("vignette.png", mVignetteTexture)
+      .nqCustom("groovy.ogg", mMusic);
     return true;
   }
 
@@ -382,7 +388,7 @@ public:
     if(mFadeOut >= 0) {
       mFadeOut += delta;
       if(mFadeOut >= cFadeOutDur) {
-        swapStatePtr(getShitState());
+        swapStatePtr(getShitState(std::move(mMusic)));
       }
       return true;
     }
@@ -430,8 +436,8 @@ public:
   }
 };
 
-State *getMenuState() {
-  return new MenuState;
+State *getMenuState(Sound &&music) {
+  return new MenuState(std::move(music));
 }
 
 } // namespace sbs

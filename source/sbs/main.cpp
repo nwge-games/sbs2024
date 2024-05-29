@@ -8,9 +8,9 @@ s32 main(s32 argc, CStr *argv) {
 
   nwge::State *statePtr;
   if(nwge::cli::flag("game")) {
-    statePtr = sbs::getShitState();
+    statePtr = sbs::getShitState({});
   } else if(nwge::cli::flag("menu")) {
-    statePtr = sbs::getMenuState();
+    statePtr = sbs::getMenuState({});
   } else {
     statePtr = sbs::getWarningState();
   }

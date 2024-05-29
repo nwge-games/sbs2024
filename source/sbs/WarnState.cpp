@@ -83,6 +83,8 @@ private:
     cContinueTextFadeInEnd = 6.0f,
     cFadeOutTime = 1.0f;
 
+  Sound mMusic;
+
 public:
   bool preload() override {
     mBundle
@@ -90,7 +92,8 @@ public:
       .nqFont("GrapeSoda.cfn", mFont)
       .nqCustom("boom.ogg", mBoom)
       .nqCustom("warnings.json", mWarnings)
-      .nqTexture("logo1.png", mLogoTexture);
+      .nqTexture("logo1.png", mLogoTexture)
+      .nqCustom("groovy.ogg", mMusic);
     return true;
   }
 
@@ -108,7 +111,7 @@ public:
     if(mFadeOutTimer >= 0.0f) {
       mFadeOutTimer += delta;
       if(mFadeOutTimer >= cFadeOutTime) {
-        swapStatePtr(getIntroState(std::move(mLogoTexture)));
+        swapStatePtr(getIntroState(std::move(mLogoTexture), std::move(mMusic)));
         return true;
       }
       return true;
