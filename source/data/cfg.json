@@ -1,11 +1,11 @@
 {
   "lube": {
     "base": 0.1,
-    "upgrade": 0.03,
+    "upgrade": 0.017,
     "maxTier": 2
   },
   "gravity": {
-    "base": 0.002,
+    "base": 0.003,
     "upgrade": 0.1,
     "threshold": 0.75,
     "maxTier": 2
