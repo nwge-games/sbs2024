@@ -15,6 +15,7 @@ static bool loadStore(Config &out, const json::Object &root);
 static bool loadToilet(Config &out, const json::Object &root);
 static bool loadBrick(Config &out, const json::Object &root);
 static bool loadWater(Config &out, const json::Object &root);
+static bool loadShitter(Config &out, const json::Object &root);
 
 bool Config::load(data::RW &file) {
   auto fileSize = file.size();
@@ -74,6 +75,10 @@ bool Config::load(data::RW &file) {
   }
 
   if(!loadWater(*this, root)) {
+    return false;
+  }
+
+  if(!loadShitter(*this, root)) {
     return false;
   }
 
@@ -310,6 +315,21 @@ bool loadOxy(Config &out, const json::Object &root) {
     return false;
   }
   out.oxy.min = static_cast<f32>(minV->number());
+
+  const auto *cooldownV = oxyObject.get("cooldown");
+  if(cooldownV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `cooldown` in key in `oxy` object.");
+    return false;
+  }
+  if(!cooldownV->isNumber()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`cooldown` in `oxy` object is not a number.");
+    return false;
+  }
+  out.oxy.cooldown = static_cast<f32>(cooldownV->number());
 
   return true;
 }
@@ -746,6 +766,85 @@ bool loadWater(Config &out, const json::Object &root) {
     return false;
   }
   out.water.scissorH = static_cast<f32>(scissorHV->number());
+
+  return true;
+}
+
+bool loadShitter(Config &out, const json::Object &root) {
+  const auto *shitterV = root.get("shitter");
+  if(shitterV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `shitter` key.");
+    return false;
+  }
+  if(!shitterV->isObject()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`shitter` is not a object.");
+    return false;
+  }
+  const auto &shitterObject = shitterV->object();
+
+  const auto *xPosV = shitterObject.get("xPos");
+  if(xPosV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `xPos` in key in `shitter` object.");
+    return false;
+  }
+  if(!xPosV->isNumber()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`xPos` in `shitter` object is not a number.");
+    return false;
+  }
+  out.shitter.xPos = static_cast<f32>(xPosV->number());
+
+  const auto *yPosV = shitterObject.get("yPos");
+  if(yPosV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `yPos` in key in `shitter` object.");
+    return false;
+  }
+  if(!yPosV->isNumber()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`yPos` in `shitter` object is not a number.");
+    return false;
+  }
+  out.shitter.yPos = static_cast<f32>(yPosV->number());
+
+  const auto *widthV = shitterObject.get("width");
+  if(widthV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `width` in key in `shitter` object.");
+    return false;
+  }
+  if(!widthV->isNumber()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`width` in `shitter` object is not a number.");
+    return false;
+  }
+  out.shitter.width = static_cast<f32>(widthV->number());
+
+  const auto *heightV = shitterObject.get("height");
+  if(heightV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `height` in key in `shitter` object.");
+    return false;
+  }
+  if(!heightV->isNumber()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`height` in `shitter` object is not a number.");
+    return false;
+  }
+  out.shitter.height = static_cast<f32>(heightV->number());
 
   return true;
 }

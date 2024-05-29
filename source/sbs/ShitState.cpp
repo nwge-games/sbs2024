@@ -108,9 +108,6 @@ private:
 
   f32 mCooldown = 0.0f;
 
-  static constexpr f32
-    cCooldownValue = 3.0f;
-
   f32 mGravity = 0.0f;
   f32 mProgressDecay = 0.9f;
 
@@ -130,6 +127,7 @@ private:
     cBrickX = 0.5f,
     cBrickFallEndY = 1.0f,
     cBrickZ = 0.55f,
+    cShitterZ = 0.549f,
     cToiletZ = 0.551f,
     cToiletFZ = 0.539f,
     cTextH = 0.05f,
@@ -285,6 +283,10 @@ private:
       {mConfig.toilet.xPos, mConfig.toilet.yPos, cToiletZ},
       {mConfig.toilet.size, mConfig.toilet.size},
       mToiletTexture);
+    render::rect(
+      {mConfig.shitter.xPos, mConfig.shitter.yPos, cShitterZ},
+      {mConfig.shitter.width, mConfig.shitter.height},
+      mShitterTexture);
 
     render::setScissorEnabled();
     render::scissor(
@@ -325,6 +327,8 @@ private:
 
   Sound mMusic;
 
+  render::gl::Texture mShitterTexture;
+
 public:
   ShitState(Sound &&music)
     : mMusic(std::move(music))
@@ -347,7 +351,8 @@ public:
       .nqCustom("pop.ogg", mPop)
       .nqCustom("breath.ogg", mBreath)
       .nqTexture("toilet.png", mToiletTexture)
-      .nqTexture("toiletF.png", mToiletFTexture);
+      .nqTexture("toiletF.png", mToiletFTexture)
+      .nqTexture("shitter.png", mShitterTexture);
     mStore.nqLoad("progress", mSave);
     return true;
   }
@@ -356,6 +361,7 @@ public:
     recalculateProgressDecay();
     recalculateGravity();
     refreshScoreString();
+    save();
     return true;
   }
 
@@ -440,7 +446,7 @@ public:
         mProgress += mGravity * delta;
       }
       if(mProgress >= 1) {
-        mCooldown = cCooldownValue;
+        mCooldown = mConfig.oxy.cooldown;
         mBrickFall = 0.0f;
         mPop.play();
         ++mSave.score;

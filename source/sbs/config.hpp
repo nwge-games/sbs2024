@@ -44,12 +44,19 @@ struct Config {
     f32 regen;
     f32 drain;
     f32 min;
+    f32 cooldown;
   } oxy;
   struct Toilet {
     f32 xPos;
     f32 yPos;
     f32 size;
   } toilet;
+  struct Shitter {
+    f32 xPos;
+    f32 yPos;
+    f32 width;
+    f32 height;
+  } shitter;
   struct Brick {
     f32 xPos;
     f32 startY;

@@ -12,11 +12,11 @@ Savefile definitions
 namespace sbs {
 
 struct Savefile {
-  bool dirty;
-  s32 score;
-  s16 lubeTier;
-  s16 gravityTier;
-  s16 prestige;
+  bool dirty = false;
+  s32 score = 0;
+  s16 lubeTier = 0;
+  s16 gravityTier = 0;
+  s16 prestige = 0;
 
   bool save(nwge::data::RW &file);
   bool load(nwge::data::RW &file);
