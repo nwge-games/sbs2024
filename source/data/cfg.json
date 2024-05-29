@@ -11,8 +11,8 @@
     "maxTier": 2
   },
   "oxy": {
-    "regen": 0.2,
-    "drain": 0.65,
+    "regen": 0.1,
+    "drain": 0.55,
     "min": 0.1,
     "cooldown": 5
   },

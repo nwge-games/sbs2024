@@ -89,6 +89,7 @@ private:
     cEffortBarColor{2, 2, 0};
 
   f32 mOxy = 1.0f;
+  f32 mOxyCooldown = 0.0f;
 
   bool mOuttaBreath = false;
 
@@ -446,7 +447,7 @@ public:
         mProgress += mGravity * delta;
       }
       if(mProgress >= 1) {
-        mCooldown = mConfig.oxy.cooldown;
+        mCooldown = 1.0f;
         mBrickFall = 0.0f;
         mPop.play();
         ++mSave.score;
