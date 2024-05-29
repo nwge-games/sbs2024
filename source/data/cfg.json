@@ -16,25 +16,25 @@
     "min": 0.1
   },
   "toilet": {
-    "xPos": 0.0,
+    "xPos": -0.1,
     "yPos": 0.0,
     "size": 1.0
   },
   "brick": {
-    "xPos": 0.65,
+    "xPos": 0.55,
     "startY": 0.14125,
     "endY": 0.34125,
     "fallSpeed": 4.0,
     "size": 0.1
   },
   "water": {
-    "minX": 0.2,
-    "maxX": 0.3,
+    "minX": 0.1,
+    "maxX": 0.2,
     "minY": 0.773,
     "maxY": 0.8,
     "width": 1,
     "height": 0.25,
-    "scissorX": 0.37,
+    "scissorX": 0.27,
     "scissorY": 0.773,
     "scissorW": 0.416,
     "scissorH": 0.226

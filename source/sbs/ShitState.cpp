@@ -80,10 +80,10 @@ private:
     cMaxEffort = 1.0f;
 
   static constexpr f32
-    cEffortBarX = 0.075f,
-    cEffortBarY = 0.075f,
     cEffortBarW = 0.1f,
     cEffortBarH = 4*cEffortBarW,
+    cEffortBarX = 0.075f,
+    cEffortBarY = 1.0f - cEffortBarH - 0.075f,
     cEffortBarZ = 0.5f;
   static constexpr glm::vec3
     cEffortBarColor{2, 2, 0};
@@ -96,7 +96,7 @@ private:
     cOxyBarW = 0.1f,
     cOxyBarH = 4*cOxyBarW,
     cOxyBarX = 0.925f - cOxyBarW,
-    cOxyBarY = 0.075f,
+    cOxyBarY = 1.0f - cOxyBarH - 0.075f,
     cOxyBarZ = 0.5f;
   static constexpr glm::vec3
     cOxyBarColor{0, 1, 1},
@@ -133,7 +133,7 @@ private:
     cToiletZ = 0.551f,
     cToiletFZ = 0.539f,
     cTextH = 0.05f,
-    cTextX = 0.5f,
+    cTextX = 1.0f - 0.075f,
     cTextY = 0.075f,
     cTextZ = 0.53f;
 
@@ -185,8 +185,8 @@ private:
   static constexpr f32
     cStoreIconW = 0.05f,
     cStoreIconH = 0.05f,
-    cStoreIconX = cTextX + 0.2f,
-    cStoreIconY = cTextY,
+    cStoreIconX = cTextX - cStoreIconW,
+    cStoreIconY = cTextY + cTextH + cPad,
     cStoreIconZ = 0.52f,
     cIconTexUnit = 1.0f/4.0f,
     cStoreIconTexX = 0.0f*cIconTexUnit,
@@ -479,7 +479,7 @@ public:
     renderBars();
 
     auto measure = mFont.measure(mScoreString, cTextH);
-    f32 textX = cTextX - measure.x / 2;
+    f32 textX = cTextX - measure.x;
     drawTextWithShadow(mFont, mScoreString, {textX, cTextY, cTextZ}, cTextH);
 
     if(mHoveringStoreIcon) {
