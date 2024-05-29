@@ -57,6 +57,18 @@ struct Config {
     f32 fallSpeed;
     f32 size;
   } brick;
+  struct Water {
+    f32 minX;
+    f32 maxX;
+    f32 minY;
+    f32 maxY;
+    f32 width;
+    f32 height;
+    f32 scissorX;
+    f32 scissorY;
+    f32 scissorW;
+    f32 scissorH;
+  } water;
   nwge::Array<StoreItem> store;
 
   bool load(nwge::data::RW &file);

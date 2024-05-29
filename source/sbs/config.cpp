@@ -14,6 +14,7 @@ static bool loadOxy(Config &out, const json::Object &root);
 static bool loadStore(Config &out, const json::Object &root);
 static bool loadToilet(Config &out, const json::Object &root);
 static bool loadBrick(Config &out, const json::Object &root);
+static bool loadWater(Config &out, const json::Object &root);
 
 bool Config::load(data::RW &file) {
   auto fileSize = file.size();
@@ -72,6 +73,10 @@ bool Config::load(data::RW &file) {
     return false;
   }
 
+  if(!loadWater(*this, root)) {
+    return false;
+  }
+
   console::note("Loaded config:");
   console::print("  Lube:");
   console::print("    Base: {}", lube.base);
@@ -91,6 +96,13 @@ bool Config::load(data::RW &file) {
   console::print("    End Y: {}", brick.endY);
   console::print("    Fall Speed: {}", brick.fallSpeed);
   console::print("    Size: {}", brick.size);
+  console::print("  Water:");
+  console::print("    Min X: {}", water.minX);
+  console::print("    Max X: {}", water.maxX);
+  console::print("    Min Y: {}", water.minY);
+  console::print("    Max Y: {}", water.maxY);
+  console::print("    Width: {}", water.width);
+  console::print("    Height: {}", water.height);
 
   return true;
 }
@@ -565,6 +577,175 @@ bool loadBrick(Config &out, const json::Object &root) {
     return false;
   }
   out.brick.size = static_cast<f32>(sizeV->number());
+
+  return true;
+}
+
+bool loadWater(Config &out, const json::Object &root) {
+  const auto *waterV = root.get("water");
+  if(waterV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `water` key.");
+    return false;
+  }
+  if(!waterV->isObject()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`water` is not a object.");
+    return false;
+  }
+  const auto &waterObject = waterV->object();
+
+  const auto *minXV = waterObject.get("minX");
+  if(minXV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `minX` in key in `water` object.");
+    return false;
+  }
+  if(!minXV->isNumber()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`minX` in `water` object is not a number.");
+    return false;
+  }
+  out.water.minX = static_cast<f32>(minXV->number());
+
+  const auto *maxXV = waterObject.get("maxX");
+  if(maxXV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `maxX` in key in `water` object.");
+    return false;
+  }
+  if(!maxXV->isNumber()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`maxX` in `water` object is not a number.");
+    return false;
+  }
+  out.water.maxX = static_cast<f32>(maxXV->number());
+
+  const auto *minYV = waterObject.get("minY");
+  if(minYV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `minY` in key in `water` object.");
+    return false;
+  }
+  if(!minYV->isNumber()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`minY` in `water` object is not a number.");
+    return false;
+  }
+  out.water.minY = static_cast<f32>(minYV->number());
+
+  const auto *maxYV = waterObject.get("maxY");
+  if(maxYV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `maxY` in key in `water` object.");
+    return false;
+  }
+  if(!maxYV->isNumber()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`maxY` in `water` object is not a number.");
+    return false;
+  }
+  out.water.maxY = static_cast<f32>(maxYV->number());
+
+  const auto *widthV = waterObject.get("width");
+  if(widthV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `width` in key in `water` object.");
+    return false;
+  }
+  if(!widthV->isNumber()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`width` in `water` object is not a number.");
+    return false;
+  }
+  out.water.width = static_cast<f32>(widthV->number());
+
+  const auto *heightV = waterObject.get("height");
+  if(heightV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `height` in key in `water` object.");
+    return false;
+  }
+  if(!heightV->isNumber()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`height` in `water` object is not a number.");
+    return false;
+  }
+  out.water.height = static_cast<f32>(heightV->number());
+
+  const auto *scissorXV = waterObject.get("scissorX");
+  if(scissorXV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `scissorX` in key in `water` object.");
+    return false;
+  }
+  if(!scissorXV->isNumber()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`scissorX` in `water` object is not a number.");
+    return false;
+  }
+  out.water.scissorX = static_cast<f32>(scissorXV->number());
+
+  const auto *scissorYV = waterObject.get("scissorY");
+  if(scissorYV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `scissorY` in key in `water` object.");
+    return false;
+  }
+  if(!scissorYV->isNumber()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`scissorY` in `water` object is not a number.");
+    return false;
+  }
+  out.water.scissorY = static_cast<f32>(scissorYV->number());
+
+  const auto *scissorWV = waterObject.get("scissorW");
+  if(scissorWV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `scissorW` in key in `water` object.");
+    return false;
+  }
+  if(!scissorWV->isNumber()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`scissorW` in `water` object is not a number.");
+    return false;
+  }
+  out.water.scissorW = static_cast<f32>(scissorWV->number());
+
+  const auto *scissorHV = waterObject.get("scissorH");
+  if(scissorHV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `scissorH` in key in `water` object.");
+    return false;
+  }
+  if(!scissorHV->isNumber()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`scissorH` in `water` object is not a number.");
+    return false;
+  }
+  out.water.scissorH = static_cast<f32>(scissorHV->number());
 
   return true;
 }

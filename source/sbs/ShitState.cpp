@@ -132,6 +132,7 @@ private:
     cBrickFallEndY = 1.0f,
     cBrickZ = 0.55f,
     cToiletZ = 0.551f,
+    cToiletFZ = 0.539f,
     cTextH = 0.05f,
     cTextX = 0.5f,
     cTextY = 0.075f,
@@ -252,7 +253,8 @@ private:
     resetSave();
   }};
 
-  f32 mWaterY = cWaterMinY;
+  f32 mWaterX = 0.0f;
+  f32 mWaterY = 0.0f;
 
   Sound mSplash;
   Sound mBuy;
@@ -260,7 +262,7 @@ private:
   Sound mPop;
   Sound mBreath;
 
-  render::gl::Texture mToiletTexture;
+  render::gl::Texture mToiletTexture, mToiletFTexture;
 
 public:
   bool preload() override {
@@ -268,7 +270,7 @@ public:
       .load({"sbs.bndl"})
       .nqTexture("bars.png", mBarsTexture)
       .nqTexture("brick.png", mBrickTexture)
-      .nqFont("inter.cfn", mFont)
+      .nqFont("GrapeSoda.cfn", mFont)
       .nqTexture("water.png", mWaterTexture)
       .nqTexture("bg.png", mBgTexture)
       .nqCustom("cfg.json", mConfig)
@@ -279,7 +281,8 @@ public:
       .nqCustom("broke.ogg", mBrokeAssMfGetAJob)
       .nqCustom("pop.ogg", mPop)
       .nqCustom("breath.ogg", mBreath)
-      .nqTexture("toilet.png", mToiletTexture);
+      .nqTexture("toilet.png", mToiletTexture)
+      .nqTexture("toiletF.png", mToiletFTexture);
     mStore.nqLoad("progress", mSave);
     return true;
   }
@@ -334,7 +337,8 @@ public:
     static bool sSplash = true;
 
     mTimer += delta;
-    mWaterY = cWaterMinY + (sinf(mTimer) + 1) * (cWaterMaxY - cWaterMinY); 
+    mWaterX = mConfig.water.minX - (0.5f*sinf(1+1.2*mTimer) + 1) * (mConfig.water.maxX - mConfig.water.minX); 
+    mWaterY = mConfig.water.minY + (0.5f*sinf(mTimer) + 1) * (mConfig.water.maxY - mConfig.water.minY); 
 
     if(mTimer < cFadeInTime) {
       return true;
@@ -448,11 +452,22 @@ public:
       {mConfig.toilet.size, mConfig.toilet.size},
       mToiletTexture);
 
+    render::setScissorEnabled();
+    render::scissor(
+      {mConfig.water.scissorX, mConfig.water.scissorY},
+      {mConfig.water.scissorW, mConfig.water.scissorH});
     render::color({1, 1, 1, 0.5f});
     render::rect(
-      {cWaterX, mWaterY, cWaterZ},
-      {cWaterW, cWaterH},
+      {mWaterX, mWaterY, cWaterZ},
+      {mConfig.water.width, mConfig.water.height},
       mWaterTexture);
+    render::setScissorEnabled(false);
+
+    render::color();
+    render::rect(
+      {mConfig.toilet.xPos, mConfig.toilet.yPos, cToiletFZ},
+      {mConfig.toilet.size, mConfig.toilet.size},
+      mToiletFTexture);
 
     render::color();
     auto measure = mFont.measure(mScoreString, cTextH);

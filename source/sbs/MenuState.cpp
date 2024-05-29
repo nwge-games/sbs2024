@@ -336,7 +336,7 @@ public:
       .load({"sbs.bndl"})
       .nqTexture("logo2.png", mLogo)
       .nqTexture("brick.png", mBrickTexture)
-      .nqFont("inter.cfn", mFont)
+      .nqFont("GrapeSoda.cfn", mFont)
       .nqCustom("reviews.json", mReviewManager)
       .nqTexture("vignette.png", mVignetteTexture);
     return true;
