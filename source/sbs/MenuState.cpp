@@ -1,8 +1,10 @@
 #include "audio.hpp"
+#include "save.hpp"
 #include "states.hpp"
 #include "version.h"
 #include <array>
 #include <nwge/data/bundle.hpp>
+#include <nwge/data/store.hpp>
 #include <nwge/render/aspectRatio.hpp>
 #include <nwge/render/draw.hpp>
 #include <nwge/render/font.hpp>
@@ -144,14 +146,7 @@ private:
   render::Font mFont;
 
   static constexpr f32
-    cTextH = 0.1f,
-    cTextX = 0.5f,
-    cTextY = 0.5f,
     cTextZ = 0.4f,
-    cTextBgW = 0.5f,
-    cTextBgH = cTextH + 0.01f,
-    cTextBgX = (1.0f - cTextBgW) / 2,
-    cTextBgY = (1.0f - cTextBgH) / 2,
     cTextBgZ = 0.404f,
     cCopyrightH = 0.02f,
     cSmallTextPad = 0.003f,
@@ -164,20 +159,10 @@ private:
     cVerH = cCopyrightH;
 
   static constexpr glm::vec4
-    cTextBgClr{0, 0, 0, 0.6},
+    cTextBgClr{0, 0, 0, 0.7},
     cHoverTextBgClr{0.75, 0.75, 0.75, 1},
     cTextColor{1, 1, 1, 1},
     cHoverTextColor{1, 1, 1, 1};
-
-  bool mHoveringText = false;
-
-  void recalculateHoveringText(glm::vec2 mousePos) {
-    auto measure = mFont.measure("Shit", cTextH);
-    f32 textX = cTextX - measure.x / 2.0f;
-    f32 textY = cTextY - measure.y / 2.0f;
-    mHoveringText = (mousePos.x >= textX && mousePos.x < textX + measure.x
-                  && mousePos.y >= textY && mousePos.y < textY + measure.y);
-  }
 
   struct ReviewManager {
     Array<String<>> reviews;
@@ -331,6 +316,72 @@ private:
   Sound mConfirmation;
   Sound mMusic;
 
+  enum Button {
+    BNone = -1,
+    BShit,
+    BExtras,
+    BMax,
+  };
+
+  static constexpr f32
+    cButtonTextH = 0.06f,
+    cButtonTextX = 0.01f,
+    cButtonTextY = 0.01f,
+    cButtonW = 0.3f,
+    cButtonH = cButtonTextH + 0.02f,
+    cButtonX = (1.0f - cButtonW) / 2,
+    cButtonY = 0.5f;
+
+    Button mHover = BNone;
+
+  static constexpr inline Button buttonAt(glm::vec2 pos) {
+    if(pos.x < cButtonX || pos.x > cButtonX + cButtonW) {
+      return BNone;
+    }
+    if(pos.y < cButtonY || pos.y > cButtonY + 2*cButtonH) {
+      return BNone;
+    }
+    auto button = Button((pos.y - cButtonY) / cButtonH);
+    if(button >= BMax) {
+      return BNone;
+    }
+    return button;
+  }
+
+  Button mSelection = BNone;
+
+  static constexpr glm::vec4
+    cBgClr{0, 0, 0, 0.6f},
+    cButtonBgClr{0, 0, 0, 0.5f},
+    cButtonHoverBgClr{0.75f, 0.75f, 0.75f, 0.5f},
+    cButtonSelectedBgClr{1, 1, 1, 0.75f},
+    cButtonTextClr{1, 1, 1, 1},
+    cButtonSelectedTextClr{0, 0, 0, 1};
+
+  void renderButton(const StringView &name, Button button) const {
+    f32 baseX = cButtonX;
+    f32 baseY = cButtonY + f32(button) * cButtonH;
+    if(mSelection == button) {
+      render::color(cButtonSelectedBgClr);
+    } else if(mHover == button) {
+      render::color(cButtonHoverBgClr);
+    } else {
+      render::color(cButtonBgClr);
+    }
+    render::rect({baseX, baseY, cTextBgZ}, {cButtonW, cButtonH});
+    if(mSelection == button) {
+      render::color(cButtonSelectedTextClr);
+    } else {
+      render::color(cButtonTextClr);
+    }
+    auto measure = mFont.measure(name, cButtonTextH);
+    f32 textX = (cButtonW - measure.x) / 2;
+    mFont.draw(name, {baseX + textX, baseY + cButtonTextY, cTextZ}, cButtonTextH);
+  }
+
+  data::Store mStore;
+  Savefile mSave;
+
 public:
   MenuState(Sound &&music)
     : mMusic(std::move(music))
@@ -345,12 +396,14 @@ public:
       .nqCustom("reviews.json", mReviewManager)
       .nqTexture("vignette.png", mVignetteTexture)
       .nqCustom("groovy.ogg", mMusic);
+    mStore.nqLoad("progress", mSave);
     return true;
   }
 
   bool init() override {
     populateBricks();
     mReviewManager.populateInstances();
+    mStore.nqSave("progress", mSave);
     return true;
   }
 
@@ -359,16 +412,22 @@ public:
       return true;
     }
 
+    Button hover;
     switch(evt.type) {
     case Event::MouseMotion:
-      recalculateHoveringText(evt.motion);
+      mHover = buttonAt(evt.motion);
       break;
     case Event::MouseUp:
-      recalculateHoveringText(evt.click.pos);
-      if(mHoveringText) {
+      hover = buttonAt(evt.click.pos);
+      if(hover == BNone) {
+        break;
+      }
+      if(hover == BShit
+      ||(hover == BExtras && mSave.prestige >= 1)) {
         mFadeOut = 0.0f;
         mConfirmation.play();
       }
+      mHover = mSelection = hover;
       break;
     default:
       break;
@@ -388,7 +447,11 @@ public:
     if(mFadeOut >= 0) {
       mFadeOut += delta;
       if(mFadeOut >= cFadeOutDur) {
-        swapStatePtr(getExtrasState(std::move(mMusic)));
+        if(mSelection == BShit) {
+          swapStatePtr(getShitState(std::move(mMusic)));
+        } else if(mSelection == BExtras) {
+          swapStatePtr(getExtrasState(std::move(mMusic)));
+        }
       }
       return true;
     }
@@ -404,14 +467,10 @@ public:
     renderBricks(mBrickTexture, m1x1);
     mReviewManager.renderInstances(mFont);
 
-    render::color(mHoveringText ? cHoverTextBgClr : cTextBgClr);
-    render::rect({cTextBgX, cTextBgY, cTextBgZ}, {cTextBgW, cTextBgH});
-
-    auto measure = mFont.measure("Shit", cTextH);
-    f32 textX = cTextX - measure.x / 2.0f;
-    f32 textY = cTextY - measure.y / 2.0f;
-    render::color(mHoveringText ? cHoverTextColor : cTextColor);
-    mFont.draw("Shit", {textX, textY, cTextZ}, cTextH);
+    renderButton("Shit", BShit);
+    if(mSave.prestige >= 1) {
+      renderButton("Extras", BExtras);
+    }
 
     render::color();
     render::rect({0, 0, cVignetteZ}, {1, 1}, mVignetteTexture);
@@ -422,8 +481,8 @@ public:
     render::color();
     mFont.draw("Copyright (c) qeaml & domi9 2024",
       {cCopyrightX, cCopyrightY, cCopyrightZ}, cCopyrightH);
-    measure = mFont.measure(SBS_VER_STR, cVerH);
-    textX = cVerX - measure.x;
+    auto measure = mFont.measure(SBS_VER_STR, cVerH);
+    auto textX = cVerX - measure.x;
     mFont.draw(SBS_VER_STR, {textX, cVerY, cVerZ}, cVerH);
 
     if(mFadeIn < cFadeInDur) {

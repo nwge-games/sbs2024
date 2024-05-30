@@ -181,7 +181,6 @@ private:
     cButtonTextH = 0.04f,
     cButtonTextX = 0.01f,
     cButtonTextY = 0.01f,
-    cButtonBgZ = 0.51f,
     cButtonX = cOuterX,
     cButtonY = cOuterY,
     cButtonW = cSideW,
@@ -233,7 +232,7 @@ private:
     } else {
       render::color(cButtonBgClr);
     }
-    render::rect({baseX, baseY, cButtonBgZ}, {cButtonW, cButtonH});
+    render::rect({baseX, baseY, cBgZ}, {cButtonW, cButtonH});
     if(mSelection == button) {
       render::color(cButtonSelectedTextClr);
     } else {
