@@ -388,7 +388,7 @@ public:
     if(mFadeOut >= 0) {
       mFadeOut += delta;
       if(mFadeOut >= cFadeOutDur) {
-        swapStatePtr(getShitState(std::move(mMusic)));
+        swapStatePtr(getExtrasState(std::move(mMusic)));
       }
       return true;
     }

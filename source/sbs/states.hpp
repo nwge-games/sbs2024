@@ -16,6 +16,7 @@ namespace sbs {
 nwge::State *getWarningState();
 nwge::State *getIntroState(nwge::render::gl::Texture &&logoTexture, Sound &&music);
 nwge::State *getMenuState(Sound &&music);
+nwge::State *getExtrasState(Sound &&music);
 nwge::State *getShitState(Sound &&music);
 nwge::State *getEndState();
 
