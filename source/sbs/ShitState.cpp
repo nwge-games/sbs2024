@@ -427,7 +427,11 @@ public:
     }
 
     if(mOxy < 1.0f) {
-      mOxy += mConfig.oxy.regen * delta;
+      f32 regen = mConfig.oxy.regenFast;
+      if(mOuttaBreath) {
+        regen = mConfig.oxy.regenSlow;
+      }
+      mOxy += regen * delta;
     } else {
       mOuttaBreath = false;
     }

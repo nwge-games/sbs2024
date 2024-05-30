@@ -41,7 +41,8 @@ struct Config {
     s16 maxTier;
   } gravity;
   struct Oxy {
-    f32 regen;
+    f32 regenFast;
+    f32 regenSlow;
     f32 drain;
     f32 min;
     f32 cooldown;

@@ -271,20 +271,35 @@ bool loadOxy(Config &out, const json::Object &root) {
   }
   const auto &oxyObject = oxyV->object();
 
-  const auto *regenV = oxyObject.get("regen");
-  if(regenV == nullptr) {
+  const auto *regenFastV = oxyObject.get("regenFast");
+  if(regenFastV == nullptr) {
     dialog::error("Config",
       "Configuration file is invalid.\n"
-      "No `regen` in key in `oxy` object.");
+      "No `regenFast` in key in `oxy` object.");
     return false;
   }
-  if(!regenV->isNumber()) {
+  if(!regenFastV->isNumber()) {
     dialog::error("Config",
       "Configuration file is invalid.\n"
-      "`regen` in `oxy` object is not a number.");
+      "`regenFast` in `oxy` object is not a number.");
     return false;
   }
-  out.oxy.regen = static_cast<f32>(regenV->number());
+  out.oxy.regenFast = static_cast<f32>(regenFastV->number());
+
+  const auto *regenSlowV = oxyObject.get("regenSlow");
+  if(regenSlowV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `regenSlow` in key in `oxy` object.");
+    return false;
+  }
+  if(!regenSlowV->isNumber()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`regenSlow` in `oxy` object is not a number.");
+    return false;
+  }
+  out.oxy.regenSlow = static_cast<f32>(regenSlowV->number());
 
   const auto *drainV = oxyObject.get("drain");
   if(drainV == nullptr) {
