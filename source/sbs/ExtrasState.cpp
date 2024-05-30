@@ -4,7 +4,9 @@
 #include <nwge/render/draw.hpp>
 #include <nwge/render/font.hpp>
 #include <nwge/render/gl/Texture.hpp>
+#include <nwge/render/mat.hpp>
 #include <nwge/render/window.hpp>
+#include <random>
 
 using namespace nwge;
 
@@ -22,7 +24,13 @@ public:
       .nqFont("GrapeSoda.cfn", mFont)
       .nqTexture("email.png", mEMail)
       .nqTexture("deving.png", mDevingTexture)
-      .nqTexture("rock.png", mRockTexture);
+      .nqTexture("rock.png", mRockTexture)
+      .nqTexture("brick.png", mBrickTexture);
+    return true;
+  }
+
+  bool init() override {
+    populateBricks();
     return true;
   }
 
@@ -31,17 +39,21 @@ public:
       return true;
     }
 
+    Button hover;
     switch(evt.type) {
     case Event::MouseMotion:
       mHover = buttonAt(evt.motion);
       break;
 
     case Event::MouseUp:
-      mHover = buttonAt(evt.click.pos);
-      if(mHover == BBack) {
+      hover = buttonAt(evt.click.pos);
+      if(hover == BNone) {
+        break;
+      }
+      if(hover == BBack) {
         mFadeOut = 0.0f;
       } else {
-        mSelection = mHover;
+        mSelection = mHover = hover;
       }
       break;
 
@@ -52,6 +64,8 @@ public:
   }
 
   bool tick(f32 delta) override {
+    updateBricks(delta);
+
     if(mFadeIn >= 0) {
       mFadeIn += delta;
       if(mFadeIn >= 1.0f) {
@@ -86,7 +100,8 @@ public:
   }
 
   void render() const override {
-    render::clear();
+    render::clear({0, 0, 0});
+    renderBricks(mBrickTexture);
 
     render::color(cBgClr);
     render::rect({cInnerX, cInnerY, cBgZ}, {cInnerW, cInnerH});
@@ -272,8 +287,8 @@ private:
   }
 
   static constexpr f32
-    cCreditsTextX = cInnerX + cInnerPad,
-    cCreditsTextY = cInnerY + cInnerPad;
+    cCreditsTextX = cInnerX + 0.05f,
+    cCreditsTextY = cInnerY + 0.05f;
 
   static constexpr StringView cCredits = 
     "Programming:\n"
@@ -308,6 +323,108 @@ private:
 
   void renderRockTab() const {
     render::rect({cRockX, cRockY, cTextZ}, {cRockW, cRockH}, mRockTexture);
+  }
+
+  static constexpr s32 cBrickCount = 50;
+
+  static constexpr f32
+    cBrickSpeed = 0.1f,
+    cBrickW = 0.04f,
+    cBrickH = 0.08f,
+    cBrickMinDistance = 0.1f,
+    cBrickMaxDistance = 1.0f,
+    cBrickMinX = -0.05f,
+    cBrickMaxX = 1.05f,
+    cBrickMinY = -0.3f,
+    cBrickMaxStartY = -0.1f,
+    cBrickDeathY = 1.1f,
+    cBrickBaseZ = 0.7f,
+    cBrickZIncrement = 0.001f,
+    cBrickMinRotSpeed = -0.2f,
+    cBrickMaxRotSpeed = 0.2f;
+
+  static constexpr glm::vec3
+    cBrickColor{0.667f, 0.29f, 0.267f};
+
+  render::gl::Texture mBrickTexture;
+
+  struct Brick {
+    glm::vec3 pos;
+    f32 rotation;
+    f32 rotationSpeed;
+
+    void regenerate(bool onScreen) {
+      static std::mt19937 sEng{std::random_device{}()};
+      static std::uniform_real_distribution<f32>
+        sDistanceDis{cBrickMinDistance, cBrickMaxDistance};
+      static std::uniform_real_distribution<f32>
+        sRotDis{-M_PI, M_PI};
+      static std::uniform_real_distribution<f32>
+        sXDis{cBrickMinX, cBrickMaxX};
+      static std::uniform_real_distribution<f32>
+        sYDis{cBrickMinY, cBrickMaxStartY};
+      static std::uniform_real_distribution<f32>
+        sOnScreenYDis{cBrickMinY, cBrickDeathY};
+      static std::uniform_real_distribution<f32>
+        sRotSpeedDis{cBrickMinRotSpeed, cBrickMaxRotSpeed};
+
+      pos.x = sXDis(sEng);
+      if(onScreen) {
+        pos.y = sOnScreenYDis(sEng);
+      } else {
+        pos.y = sYDis(sEng);
+      }
+      pos.z = sDistanceDis(sEng);
+      rotation = sRotDis(sEng);
+      rotationSpeed = sRotSpeedDis(sEng);
+    }
+
+    void update(f32 delta) {
+      pos.y += cBrickSpeed * delta * pos.z;
+
+      if(pos.y >= cBrickDeathY) {
+        regenerate(false);
+        return;
+      }
+
+      rotation += rotationSpeed * delta;
+    }
+
+    void render(const render::gl::Texture &texture) const {
+      render::color({pos.z, pos.z, pos.z});
+      render::mat::push();
+      render::mat::translate({
+        pos.x, pos.y,
+        cBrickBaseZ - pos.z * cBrickZIncrement});
+      render::mat::translate({cBrickW/2.0f, cBrickH/2.0f, 0.0f});
+      render::mat::rotate(rotation, {0, 0, 1});
+      render::mat::translate({-cBrickW/2.0f, -cBrickH/2.0f, 0.0f});
+      render::mat::scale({
+        cBrickW * pos.z * pos.z,
+        cBrickH * pos.z * pos.z,
+        1});
+      render::rect({0, 0, 0}, {1, 1}, texture);
+      render::mat::pop();
+    }
+  };
+  std::array<Brick, cBrickCount> mBricks{};
+
+  void populateBricks() {
+    for(auto &brick: mBricks) {
+      brick.regenerate(true);
+    }
+  }
+
+  void updateBricks(f32 delta) {
+    for(auto &brick: mBricks) {
+      brick.update(delta);
+    }
+  }
+
+  void renderBricks(const render::gl::Texture &texture) const {
+    for(const auto &brick: mBricks) {
+      brick.render(texture);
+    }
   }
 };
 
