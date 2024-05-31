@@ -475,9 +475,9 @@ public:
     render::color();
     render::rect({0, 0, cVignetteZ}, {1, 1}, mVignetteTexture);
 
-    render::color({1, 0, 0});
-    mFont.draw("If you leak this build we will leak your internal organs",
-      {cCopyrightX, cCopyrightY - 2*cCopyrightH, cCopyrightZ}, cCopyrightH);
+    // render::color({1, 0, 0});
+    // mFont.draw("If you leak this build we will leak your internal organs",
+    //  {cCopyrightX, cCopyrightY - 2*cCopyrightH, cCopyrightZ}, cCopyrightH);
     render::color();
     mFont.draw("Copyright (c) qeaml & domi9 2024",
       {cCopyrightX, cCopyrightY, cCopyrightZ}, cCopyrightH);
