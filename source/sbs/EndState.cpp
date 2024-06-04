@@ -39,7 +39,13 @@ public:
 
   bool tick(f32 delta) override {
     mCountdown -= delta;
-    return mCountdown >= 0;
+    if(mCountdown <= 0) {
+      if(mSave.prestige == 1) {
+        dialog::info("Notification", "Something new has appeared in the store...");
+      }
+      return false;
+    }
+    return true;
   }
 
   void render() const override {
