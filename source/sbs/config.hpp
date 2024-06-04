@@ -18,12 +18,14 @@ struct StoreItem {
     None,
     Lube,    // when bought lubeTier = argument
     Gravity, // when bought gravityTier = argument
+    Oxy,     // when bought oxyTier = argument
     EndGame  // when bough close game & wipe save
   } kind = None;
   s16 argument = 0;
 
   s16 price = 1;
   s16 icon = 0;
+  s32 prestige = 0; // minimum prestige level for item to be available
   nwge::String<> name;
   nwge::String<> desc;
 };

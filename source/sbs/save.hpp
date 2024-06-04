@@ -17,6 +17,7 @@ struct Savefile {
   s16 lubeTier = 0;
   s16 gravityTier = 0;
   s16 prestige = 0;
+  s16 oxyTier = 0;
 
   bool save(nwge::data::RW &file);
   bool load(nwge::data::RW &file);

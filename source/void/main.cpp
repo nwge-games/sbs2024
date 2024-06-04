@@ -30,7 +30,7 @@ public:
     for(auto &brick: mBricks) {
       brick.update(delta);
     }
-    return !mQuit.wasPressed();
+    return true;
   }
 
   void render() const override {
@@ -41,7 +41,9 @@ public:
   }
 
 private:
-  KeyBind mQuit{"void.quit", Key::Escape};
+  KeyBind mQuit{"void.quit", Key::Escape, KeyBind::Callback([]{
+    return false;
+  })};
 
   data::Bundle mBundle;
   render::AspectRatio m1x1{1, 1};

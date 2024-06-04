@@ -583,5 +583,15 @@
     "person": "Crazy Horse",
     "quote": "Neigh",
     "rating": 7.8
+  },
+  {
+    "person": "Mohammed",
+    "quote": "This game made me feel again",
+    "rating": 9.5
+  },
+  {
+    "person": "Gazover",
+    "quote": "Evil Laugh",
+    "rating": 6.7
   }
 ]

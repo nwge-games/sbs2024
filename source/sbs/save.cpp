@@ -17,6 +17,9 @@ bool Savefile::save(data::RW &file) {
   if(!file.write(prestige)) {
     return false;
   }
+  if(!file.write(oxyTier)) {
+    return false;
+  }
   dirty = false;
   return true;
 }
@@ -34,6 +37,7 @@ bool Savefile::load(data::RW &file) {
   if(!file.read(prestige)) {
     return false;
   }
+  file.read(oxyTier);
   dirty = false;
   return true;
 }

@@ -16,11 +16,16 @@ private:
 
   [[nodiscard]]
   bool hasItem(const StoreItem &item) const {
+    if(mData.save.prestige < item.prestige) {
+      return false;
+    }
     switch(item.kind) {
     case sbs::StoreItem::Lube:
       return mData.save.lubeTier >= item.argument;
     case sbs::StoreItem::Gravity:
       return mData.save.gravityTier >= item.argument;
+    case sbs::StoreItem::Oxy:
+      return mData.save.oxyTier >= item.argument;
     default:
       return false;
     }
@@ -55,7 +60,7 @@ private:
     cItemAreaW = cWindowW - 2*cPad,
     cItemAreaH = cWindowH - 2*cPad - cTitleTextH - cPad,
     cItemW = cItemAreaW,
-    cItemH = cItemAreaH / 5,
+    cItemH = cItemAreaH / 5.5f,
     cItemX = cItemAreaX,
     cItemY = cItemAreaY,
     cItemZ = 0.036f,
@@ -83,7 +88,7 @@ private:
       mItemHover = -1;
       return;
     }
-    mItemHover = s32((mousePos.y - cItemAreaY) / cItemH);
+    mItemHover = s32((mousePos.y + f32(mScroll) * cScrollScalar - cItemAreaY) / cItemH);
   }
 
   static constexpr s32
@@ -126,15 +131,41 @@ private:
     case sbs::StoreItem::Gravity:
       mData.save.gravityTier = SDL_max(mData.save.gravityTier, item.argument);
       break;
+    case sbs::StoreItem::Oxy:
+      mData.save.oxyTier = SDL_max(mData.save.oxyTier, item.argument);
+      break;
     case sbs::StoreItem::EndGame:
       swapStatePtr(getEndState());
       return;
-    default:
-      break; // whatever
+    case sbs::StoreItem::None:
+      NWGE_ASSERT(false, "StoreItem::None");
     }
     mPurchaseFloat = mItemHover;
     mItemHover = -1;
     mData.buySound.play();
+  }
+
+  s32 mScroll = 0;
+
+  static constexpr s32
+    cMinScroll = 0,
+    cMaxScroll = 7;
+  static constexpr f32 cScrollScalar = 0.05f;
+
+  const StoreItem *getHoveredItem() {
+    if(mItemHover < 0) {
+      return nullptr;
+    }
+    s32 displayIdx = 0;
+    for(const auto &item: mData.config.store) {
+      if(item.prestige > mData.save.prestige) {
+        continue;
+      }
+      if(displayIdx++ == mItemHover) {
+        return &item;
+      }
+    }
+    return nullptr;
   }
 
 public:
@@ -150,17 +181,23 @@ public:
         return true;
       }
       updateItemHover(evt.click.pos);
-      if(mItemHover == -1) {
+      if(mItemHover == -1 || usize(mItemHover) >= mData.config.store.size()) {
         return true;
       }
-      const auto &item = mData.config.store[mItemHover];
+      const auto *item = getHoveredItem();
+      if(item == nullptr) {
+        return true;
+      }
       mPurchaseFloatAnchor = evt.click.pos;
       mPurchaseFloatTimer = 0.0f;
-      acquire(item);
+      acquire(*item);
       return true;
     }
     if(evt.type == Event::MouseMotion) {
       updateItemHover(evt.motion);
+    }
+    if(evt.type == Event::MouseScroll) {
+      mScroll = SDL_clamp(mScroll + evt.scroll, cMinScroll, cMaxScroll);
     }
     return true;
   }
@@ -179,14 +216,21 @@ public:
     render::color(cBgColor);
     render::rect({0, 0, cBgZ}, {1, 1});
 
+    render::setScissorEnabled();
+    render::scissor({cItemAreaX, cItemAreaY}, {cItemAreaW, cItemAreaH});
+
     static constexpr usize cTextBufSz = 100;
     std::array<char, cTextBufSz> textBuf{};
     bool owned;
     f32 baseY;
+    s32 displayIdx = 0;
     for(usize i = 0; i < mData.config.store.size(); ++i) {
       const auto &item = mData.config.store[i];
+      if(item.prestige > mData.save.prestige) {
+        continue;
+      }
       owned = hasItem(item);
-      baseY = cItemY + f32(i) * cItemH;
+      baseY = cItemY + f32(displayIdx++) * cItemH - f32(mScroll) * cScrollScalar;
       static constexpr f32 cNameOff = cPad;
       static constexpr f32 cDescOff = cNameOff+ cItemNameTextH;
       static constexpr f32 cPriceOff = cDescOff + cItemDescTextH;
@@ -239,6 +283,8 @@ public:
           cItemNameTextH);
       }
     }
+
+    render::setScissorEnabled(false);
 
     render::color(cWindowBgColor);
     render::rect(

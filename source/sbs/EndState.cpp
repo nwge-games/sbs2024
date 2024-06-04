@@ -29,8 +29,9 @@ public:
   }
 
   bool init() override {
-    ++mSave.prestige;
-    mSave.score = mSave.lubeTier = mSave.gravityTier = 0;
+    auto prestige = s16(mSave.prestige + 1);
+    mSave = {};
+    mSave.prestige = prestige;
     mStore.nqSave("progress", mSave);
     mSound.play();
     return true;

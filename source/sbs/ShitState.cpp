@@ -247,6 +247,20 @@ private:
     }
   }};
 
+  console::Command mOxyCommand{"sbs.oxyTier", [this](auto &args){
+    if(args.size() == 0) {
+      console::print("oxyTier: {}", mSave.oxyTier);
+    }
+    if(args.size() == 1) {
+      try {
+        mSave.oxyTier = boost::lexical_cast<s16>(args[0].begin(), args[0].size());
+        console::print("oxyTier: {}", mSave.oxyTier);
+      } catch(boost::bad_lexical_cast &e) {
+        console::error("bad numeric literal: {}", args[0]);
+      }
+    }
+  }};
+
   console::Command mResetCommand{"sbs.reset", [this](){
     resetSave();
   }};
@@ -428,7 +442,7 @@ public:
 
     if(mOxy < 1.0f) {
       f32 regen = mConfig.oxy.regenFast;
-      if(mOuttaBreath) {
+      if(mOuttaBreath && mSave.oxyTier < 1) {
         regen = mConfig.oxy.regenSlow;
       }
       mOxy += regen * delta;

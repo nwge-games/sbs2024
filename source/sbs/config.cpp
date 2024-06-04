@@ -418,6 +418,11 @@ bool loadStore(Config &out, const json::Object &root) {
     }
     item.icon = static_cast<s16>(iconV->number());
 
+    const auto *prestigeV = itemObject.get("prestige");
+    if(prestigeV != nullptr && prestigeV->isNumber()) {
+      item.prestige = s32(prestigeV->number());
+    }
+
     const auto *lubeTierV = itemObject.get("lubeTier");
     if(lubeTierV != nullptr) {
       item.kind = StoreItem::Lube;
@@ -442,6 +447,19 @@ bool loadStore(Config &out, const json::Object &root) {
         return false;
       }
       item.argument = static_cast<s16>(gravityTierV->number());
+      continue;
+    }
+    const auto *oxyTierV = itemObject.get("oxyTier");
+    if(oxyTierV != nullptr) {
+      item.kind = StoreItem::Oxy;
+      if(!oxyTierV->isNumber()) {
+        dialog::error("Config",
+          "Configuration file is invalid.\n"
+          "`oxyTier` of `store` element {} is not a Number.",
+          i);
+        return false;
+      }
+      item.argument = static_cast<s16>(oxyTierV->number());
       continue;
     }
     const auto *endGameV = itemObject.get("endGame");

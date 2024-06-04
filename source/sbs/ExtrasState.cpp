@@ -81,21 +81,6 @@ public:
       }
       return true;
     }
-
-    if(mSelection == BBehindTheScenes) {
-      if(mNext.wasPressed()) {
-          ++mDevingPic;
-          if(mDevingPic == cDevingPicCount) {
-            mDevingPic = 0;
-          }
-      }
-      if(mPrev.wasPressed()) {
-          --mDevingPic;
-          if(mDevingPic == -1) {
-            mDevingPic = cDevingPicCount - 1;
-          }
-      }
-    }
     return true;
   }
 
@@ -153,8 +138,30 @@ private:
   Sound mMusic;
   data::Bundle mBundle;
   render::Font mFont;
-  KeyBind mNext{"sbs.next", Key::Right};
-  KeyBind mPrev{"sbs.prev", Key::Left};
+  KeyBind mNext{"sbs.next", Key::Right, [this]{
+    next();
+  }};
+  KeyBind mPrev{"sbs.prev", Key::Left, [this]{
+    prev();
+  }};
+
+  void next() {
+    if(mSelection == BBehindTheScenes) {
+      ++mDevingPic;
+      if(mDevingPic == cDevingPicCount) {
+        mDevingPic = 0;
+      }
+    }
+  }
+
+  void prev() {
+    if(mSelection == BBehindTheScenes) {
+      --mDevingPic;
+      if(mDevingPic == -1) {
+        mDevingPic = cDevingPicCount - 1;
+      }
+    }
+  }
 
   f32 mFadeIn = 0;
   f32 mFadeOut = -1;

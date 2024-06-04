@@ -77,6 +77,14 @@
       "gravityTier": 2
     },
     {
+      "name": "Inhaler",
+      "desc": "In case of oxygen-related emergencies.",
+      "price": 40,
+      "icon": 4,
+      "oxyTier": 1,
+      "prestige": 1
+    },
+    {
       "name": "Supermassive Black Hole",
       "desc": "It sucks.",
       "price": 50,
