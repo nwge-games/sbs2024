@@ -4,6 +4,7 @@
 #include <nwge/render/draw.hpp>
 #include <nwge/render/font.hpp>
 #include <nwge/render/window.hpp>
+#include <nwge/time.hpp>
 #include <random>
 
 using namespace nwge;
@@ -111,6 +112,14 @@ public:
     if(mFadeOutTimer >= 0.0f) {
       mFadeOutTimer += delta;
       if(mFadeOutTimer >= cFadeOutTime) {
+        auto today = Date::today();
+        if(today.year != 2024) {
+          dialog::info("Too Late",
+            "Sorry, but the game is already finished.\n"
+            "\n"
+            "The game is no longer available starting 2025-01-01.");
+          return false;
+        }
         swapStatePtr(getIntroState(std::move(mLogoTexture), std::move(mMusic)));
         return true;
       }

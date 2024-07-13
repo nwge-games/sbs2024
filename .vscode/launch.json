@@ -9,7 +9,7 @@
       "request": "launch",
       "name": "Debug",
       "program": "${workspaceFolder}/target/debug/sbs",
-      "args": ["-game"],
+      "args": [],
       "cwd": "${workspaceFolder}/target"
     }
   ]

@@ -11,6 +11,7 @@
 #include <nwge/render/gl/Texture.hpp>
 #include <nwge/render/mat.hpp>
 #include <nwge/render/window.hpp>
+#include <nwge/time.hpp>
 #include <random>
 
 using namespace nwge;
@@ -447,6 +448,14 @@ public:
     if(mFadeOut >= 0) {
       mFadeOut += delta;
       if(mFadeOut >= cFadeOutDur) {
+        auto today = Date::today();
+        if(today.year != 2024) {
+          dialog::info("Too Late",
+            "Sorry, but the game is already finished.\n"
+            "\n"
+            "The game is no longer available starting 2025-01-01.");
+          return false;
+        }
         if(mSelection == BShit) {
           swapStatePtr(getShitState(std::move(mMusic)));
         } else if(mSelection == BExtras) {

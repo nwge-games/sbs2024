@@ -20,9 +20,9 @@ out = "target/sbs.bndl"
 [sbs]
 exe = "sbs"
 lang = "cpp"
-libs = [ "nwge", "nwge_cli", "SDL2", "SDL2_mixer" ]
+dyn-libs = [ "nwge", "nwge_cli", "SDL2", "SDL2_mixer" ]
 
 [void]
 exe = "void"
 lang = "cpp"
-libs = [ "nwge" ]
+dyn-libs = [ "nwge" ]
