@@ -475,13 +475,13 @@ public:
         checkSocialButtonClick(evt.click.pos);
         break;
       }
+      mHover = mSelection = hover;
       if(hover == BShit
       ||(hover == BExtras && mSave.prestige >= 1)) {
         mFadeOut = 0.0f;
         mConfirmation.play();
         break;
       }
-      mHover = mSelection = hover;
       break;
     default:
       break;
