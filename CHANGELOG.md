@@ -6,6 +6,7 @@
 * Added time restriction. The game is no longer playable in years other than
   2024.
 * Added new warning labels
+* Added social media buttons to main menu.
 
 ## v1.1
 
