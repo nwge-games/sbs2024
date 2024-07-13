@@ -38,7 +38,7 @@ static constexpr glm::vec3
 static constexpr glm::vec4
   cWindowBgColor{0, 0, 0, 0.6f};
 
-constexpr inline void drawTextWithShadow(
+inline void drawTextWithShadow(
   const nwge::render::Font &font,
   const nwge::StringView &text,
   glm::vec3 pos, f32 height,
