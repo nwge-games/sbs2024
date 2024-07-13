@@ -5,6 +5,7 @@
 * Updated to nwge v0.12
 * Added time restriction. The game is no longer playable in years other than
   2024.
+* Added new warning labels
 
 ## v1.1
 
