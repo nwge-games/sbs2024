@@ -5,6 +5,7 @@
 #include <array>
 #include <nwge/data/bundle.hpp>
 #include <nwge/data/store.hpp>
+#include <nwge/dialog.hpp>
 #include <nwge/render/aspectRatio.hpp>
 #include <nwge/render/draw.hpp>
 #include <nwge/render/font.hpp>
@@ -380,8 +381,56 @@ private:
     mFont.draw(name, {baseX + textX, baseY + cButtonTextY, cTextZ}, cButtonTextH);
   }
 
+  Config mConfig;
   data::Store mStore;
   Savefile mSave;
+
+  static constexpr s32 cSocialButtonCount = 2;
+  static constexpr f32
+    cSocialButtonW = 0.08f,
+    cSocialButtonStride = 0.1f,
+    cSocialButtonH = cSocialButtonW,
+    cSocialButtonX = 1.0f - cSocialButtonStride*cSocialButtonCount,
+    cSocialButtonY = 1.0f - cSocialButtonStride,
+    cSocialButtonTexUnit = 1.0f / cSocialButtonCount,
+    cSocialButtonZ = cTextZ;
+
+  render::gl::Texture mSocialsTexture;
+
+  void renderSocialButton(s32 buttonNo) const {
+    f32 buttonX = cSocialButtonX + f32(buttonNo) * cSocialButtonStride;
+    f32 texX = f32(buttonNo) * cSocialButtonTexUnit;
+    render::rect(
+      {buttonX, cSocialButtonY, cSocialButtonZ},
+      {cSocialButtonW, cSocialButtonH},
+      mSocialsTexture,
+      {{texX, 0}, {cSocialButtonTexUnit, 1}});
+  }
+
+  void checkSocialButtonClick(glm::vec2 pos) const {
+    static constexpr f32 cMaxX =
+      cSocialButtonX + cSocialButtonStride * cSocialButtonCount;
+    if(pos.x < cSocialButtonX || pos.x > cMaxX) {
+      return;
+    }
+    if(pos.y < cSocialButtonY || pos.y > cSocialButtonY + cSocialButtonH) {
+      return;
+    }
+    auto button = s32((pos.x - cSocialButtonX) / cSocialButtonStride);
+    if(button < 0 || button >= cSocialButtonCount) {
+      return;
+    }
+    switch(button) {
+    case 0:
+      dialog::openURL(mConfig.socials.xDotCom);
+      break;
+    case 1:
+      dialog::openURL(mConfig.socials.discord);
+      break;
+    default:
+      break;
+    }
+  }
 
 public:
   MenuState(Sound &&music)
@@ -396,7 +445,9 @@ public:
       .nqFont("GrapeSoda.cfn", mFont)
       .nqCustom("reviews.json", mReviewManager)
       .nqTexture("vignette.png", mVignetteTexture)
-      .nqCustom("groovy.ogg", mMusic);
+      .nqCustom("groovy.ogg", mMusic)
+      .nqTexture("socials.png", mSocialsTexture)
+      .nqCustom("cfg.json", mConfig);
     mStore.nqLoad("progress", mSave);
     return true;
   }
@@ -421,12 +472,14 @@ public:
     case Event::MouseUp:
       hover = buttonAt(evt.click.pos);
       if(hover == BNone) {
+        checkSocialButtonClick(evt.click.pos);
         break;
       }
       if(hover == BShit
       ||(hover == BExtras && mSave.prestige >= 1)) {
         mFadeOut = 0.0f;
         mConfirmation.play();
+        break;
       }
       mHover = mSelection = hover;
       break;
@@ -493,6 +546,11 @@ public:
     auto measure = mFont.measure(SBS_VER_STR, cVerH);
     auto textX = cVerX - measure.x;
     mFont.draw(SBS_VER_STR, {textX, cVerY, cVerZ}, cVerH);
+
+    #pragma unroll
+    for(s32 i = 0; i < cSocialButtonCount; ++i) {
+      renderSocialButton(i);
+    }
 
     if(mFadeIn < cFadeInDur) {
       render::color({0, 0, 0, 1.0f - mFadeIn/cFadeInDur});

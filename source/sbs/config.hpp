@@ -31,6 +31,10 @@ struct StoreItem {
 };
 
 struct Config {
+  struct Socials {
+    nwge::String<> xDotCom;
+    nwge::String<> discord;
+  } socials;
   struct Lube {
     f32 base;
     f32 upgrade;

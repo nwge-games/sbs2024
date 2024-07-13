@@ -1,4 +1,8 @@
 {
+  "socials": {
+    "x.com": "https://x.com/nwge_games",
+    "discord": "https://discord.gg/y7GxumVE3G"
+  },
   "lube": {
     "base": 0.1,
     "upgrade": 0.025,

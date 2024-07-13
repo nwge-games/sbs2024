@@ -8,6 +8,7 @@ using namespace nwge;
 
 namespace sbs {
 
+static bool loadSocials(Config &out, const json::Object &root);
 static bool loadLube(Config &out, const json::Object &root);
 static bool loadGravity(Config &out, const json::Object &root);
 static bool loadOxy(Config &out, const json::Object &root);
@@ -49,6 +50,10 @@ bool Config::load(data::RW &file) {
     return false;
   }
   const auto &root = res.value->object();
+
+  if(!loadSocials(*this, root)) {
+    return false;
+  }
 
   if(!loadLube(*this, root)) {
     return false;
@@ -109,6 +114,54 @@ bool Config::load(data::RW &file) {
   console::print("    Width: {}", water.width);
   console::print("    Height: {}", water.height);
 
+  return true;
+}
+
+bool loadSocials(Config &out, const json::Object &root) {
+  const auto *socialsV = root.get("socials");
+  if(socialsV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `socials` key.");
+    return false;
+  }
+  if(!socialsV->isObject()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`socials` is not a object.");
+    return false;
+  }
+  const auto &socialsObject = socialsV->object();
+
+  const auto *xDotComV = socialsObject.get("x.com");
+  if(xDotComV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `x.com` key in `socials` object.");
+    return false;
+  }
+  if(!xDotComV->isString()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`x.com` is not a string.");
+    return false;
+  }
+  out.socials.xDotCom = xDotComV->string();
+
+  const auto *discordV = socialsObject.get("discord");
+  if(discordV == nullptr) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "No `discord` key in `socials` object.");
+    return false;
+  }
+  if(!discordV->isString()) {
+    dialog::error("Config",
+      "Configuration file is invalid.\n"
+      "`discord` is not a string.");
+    return false;
+  }
+  out.socials.discord = discordV->string();
   return true;
 }
 
