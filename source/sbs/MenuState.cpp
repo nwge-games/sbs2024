@@ -1,8 +1,10 @@
 #include "audio.hpp"
 #include "save.hpp"
-#include "states.hpp"
 #include "version.h"
+#include "states.hpp"
+#include "minigames.hpp"
 #include <array>
+#include <nwge/console/Command.hpp>
 #include <nwge/data/bundle.hpp>
 #include <nwge/data/store.hpp>
 #include <nwge/dialog.hpp>
@@ -431,6 +433,10 @@ private:
       break;
     }
   }
+
+  console::Command mTestMiniGameCommand{"sbs.testMiniGame", []{
+    swapStatePtr(getMiniGameState(MiniGame::test(), MiniGame::ReturnToMenu));
+  }};
 
 public:
   MenuState(Sound &&music)
