@@ -8,7 +8,7 @@ Simulator 2022, based on the infamous nwge engine.
 The following is a list of additions compared to the original Shitting Bricks
 Simulator 2022.
 
-* Logo Screen. Now repping the "qeaml & domi9 Studios" brand!
+* Logo Screen. Now repping the "Nwge Game Studio" brand!
 * Improved Title Screen. Screensaver much?
 * Improved Graphics. Now with real textures!
 * Balance Changes. Now with real lube!

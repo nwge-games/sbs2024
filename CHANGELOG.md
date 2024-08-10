@@ -1,5 +1,12 @@
 # SBS2024 Changelog
 
+## v1.3
+
+* Updated to nwge v0.13
+* Replaced all mentions of "qeaml & domi9 Studios" with "Nwge Game Studio"
+* Removed unused files
+* Fixed music playing during ending screen
+
 ## v1.2
 
 * Updated to nwge v0.12

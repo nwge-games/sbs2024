@@ -40,7 +40,14 @@ bool Sound::load(nwge::data::RW &file) {
 }
 
 void Sound::play() {
-  Mix_PlayChannel(-1, mChunk, 0);
+  mChannel = Mix_PlayChannel(-1, mChunk, 0);
+}
+
+void Sound::stop() {
+  if(mChannel != -1) {
+    Mix_HaltChannel(mChannel);
+    mChannel = -1;
+  }
 }
 
 } // namespace sbs

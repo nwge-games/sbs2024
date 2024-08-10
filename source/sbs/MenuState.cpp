@@ -546,7 +546,7 @@ public:
     // mFont.draw("If you leak this build we will leak your internal organs",
     //  {cCopyrightX, cCopyrightY - 2*cCopyrightH, cCopyrightZ}, cCopyrightH);
     render::color();
-    mFont.draw("Copyright (c) qeaml & domi9 2024",
+    mFont.draw("Copyright (c) Nwge Game Studio 2024",
       {cCopyrightX, cCopyrightY, cCopyrightZ}, cCopyrightH);
     auto measure = mFont.measure(SBS_VER_STR, cVerH);
     auto textX = cVerX - measure.x;

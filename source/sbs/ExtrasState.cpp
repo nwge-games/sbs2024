@@ -295,7 +295,7 @@ private:
     cCreditsTextX = cInnerX + 0.05f,
     cCreditsTextY = cInnerY + 0.05f;
 
-  static constexpr StringView cCredits = 
+  static constexpr StringView cCredits =
     "Programming:\n"
     "  qeaml\n"
     "\n"
