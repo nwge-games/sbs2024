@@ -219,8 +219,6 @@ public:
     render::enableScissor();
     render::scissor({cItemAreaX, cItemAreaY}, {cItemAreaW, cItemAreaH});
 
-    static constexpr usize cTextBufSz = 100;
-    std::array<char, cTextBufSz> textBuf{};
     bool owned;
     f32 baseY;
     s32 displayIdx = 0;
@@ -276,9 +274,8 @@ public:
           {cItemTextX, baseY + cPriceOff, cItemTextZ},
           cItemNameTextH);
       } else {
-        int len = snprintf(textBuf.data(), cTextBufSz, "Price: %d", item.price);
-        drawTextWithShadow(mData.font,
-          {textBuf.data(), usize(len)},
+        ScratchString text = ScratchString::formatted("Price: {}", item.price);
+        drawTextWithShadow(mData.font, text,
           {cItemTextX, baseY + cPriceOff, cItemTextZ},
           cItemNameTextH);
       }
@@ -312,25 +309,19 @@ public:
       f32 alpha = mPurchaseFloatTimer / cPurchaseFloatLifetime;
       glm::vec3 pos = {mPurchaseFloatAnchor, cPurchaseFloatZ};
       pos.y -= alpha * cPurchaseFloatDistance;
-      int len;
+      StringView text;
       if(mPurchaseFloat == cInsufficientFundsFloat) {
         color = {cInsufficientFundsColor, 1.0f - alpha};
-        len = snprintf(textBuf.data(), cTextBufSz,
-          "Insufficient funds");
+        text = "Insufficient funds"_sv;
       } else if(mPurchaseFloat == cAlreadyOwnedFloat) {
         color = {cInsufficientFundsColor, 1.0f - alpha};
-        len = snprintf(textBuf.data(), cTextBufSz,
-          "Already owned");
+        text = "Already owned"_sv;
       } else {
         const auto &item = mData.config.store[mPurchaseFloat];
         color = {cPurchaseFloatColor, 1.0f - alpha};
-        len = snprintf(textBuf.data(), cTextBufSz,
-          "+%*.*s",
-          s32(item.name.size()), s32(item.name.size()), item.name.begin());
+        text = ScratchString::formatted("+{}", item.name);
       }
-      drawTextWithShadow(mData.font,
-        {textBuf.data(), usize(len)},
-        pos, cPurchaseFloatH, color);
+      drawTextWithShadow(mData.font, text, pos, cPurchaseFloatH, color);
     }
   }
 };

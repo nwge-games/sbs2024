@@ -533,10 +533,6 @@ public:
       render::rect({0, 0, cFadeZ}, {1,1});
     }
   }
-
-  ~ShitState() {
-    mMusic.stop();
-  }
 };
 
 State *getShitState(Sound &&music) {

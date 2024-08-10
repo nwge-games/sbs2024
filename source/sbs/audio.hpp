@@ -17,27 +17,16 @@ void quitAudio();
 struct Sound {
 public:
   Sound();
-  constexpr inline Sound(Sound &&other) noexcept {
-    if(this != &other) {
-      mChunk = other.mChunk;
-      mChannel = other.mChannel;
-      other.mChunk = nullptr;
-      other.mChannel = -1;
-    }
-  }
-  constexpr inline Sound &operator=(Sound &&other) noexcept {
-    if(this != &other) {
-      mChunk = other.mChunk;
-      mChannel = other.mChannel;
-      other.mChunk = nullptr;
-      other.mChannel = -1;
-    }
+  Sound(Sound &&other) noexcept;
+  Sound &operator=(Sound &&other) noexcept {
+    new(this) Sound(std::move(other));
     return *this;
   }
   ~Sound();
 
   bool load(nwge::data::RW &file);
   void play();
+  bool playing();
   void stop();
 
 private:

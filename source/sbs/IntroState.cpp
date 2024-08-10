@@ -37,7 +37,9 @@ public:
   {}
 
   bool init() override {
-    mMusic.play();
+    if(!mMusic.playing()) {
+      mMusic.play();
+    }
     return true;
   }
 
