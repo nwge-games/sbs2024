@@ -8,7 +8,7 @@ Common UI definitions
 
 #include <nwge/common/def.h>
 #include <nwge/render/draw.hpp>
-#include <nwge/render/font.hpp>
+#include <nwge/render/Font.hpp>
 
 namespace sbs {
 

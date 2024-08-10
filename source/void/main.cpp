@@ -1,11 +1,11 @@
 #include <nwge/engine.hpp>
 #include <nwge/bind.hpp>
 #include <nwge/data/bundle.hpp>
-#include <nwge/render/aspectRatio.hpp>
+#include <nwge/render/AspectRatio.hpp>
 #include <nwge/render/draw.hpp>
 #include <nwge/render/mat.hpp>
 #include <nwge/render/window.hpp>
-#include <nwge/render/gl/Texture.hpp>
+#include <nwge/render/Texture.hpp>
 #include <random>
 
 using namespace nwge;
@@ -66,7 +66,7 @@ private:
     cBrickMinRotSpeed = -0.2f,
     cBrickMaxRotSpeed = 0.2f;
 
-  render::gl::Texture mBrickTexture;
+  render::Texture mBrickTexture;
 
   struct Brick {
     glm::vec3 pos;
@@ -110,7 +110,7 @@ private:
       rotation += rotationSpeed * delta;
     }
 
-    void render(const render::gl::Texture &texture, const render::AspectRatio &deStretch) const {
+    void render(const render::Texture &texture, const render::AspectRatio &deStretch) const {
       render::color({pos.z, pos.z, pos.z});
       render::mat::push();
       render::mat::translate({

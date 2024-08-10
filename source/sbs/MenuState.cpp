@@ -8,10 +8,9 @@
 #include <nwge/data/bundle.hpp>
 #include <nwge/data/store.hpp>
 #include <nwge/dialog.hpp>
-#include <nwge/render/aspectRatio.hpp>
+#include <nwge/render/AspectRatio.hpp>
 #include <nwge/render/draw.hpp>
-#include <nwge/render/font.hpp>
-#include <nwge/render/gl/Texture.hpp>
+#include <nwge/render/Texture.hpp>
 #include <nwge/render/mat.hpp>
 #include <nwge/render/window.hpp>
 #include <nwge/time.hpp>
@@ -24,7 +23,7 @@ namespace sbs {
 class MenuState: public State {
 private:
   data::Bundle mBundle;
-  render::gl::Texture mLogo;
+  render::Texture mLogo;
 
   f32 mFadeIn = 0.0f;
   f32 mFadeOut = -1.0f;
@@ -66,7 +65,7 @@ private:
   static constexpr glm::vec3
     cBrickColor{0.667f, 0.29f, 0.267f};
 
-  render::gl::Texture mBrickTexture;
+  render::Texture mBrickTexture;
 
   struct Brick {
     glm::vec3 pos;
@@ -110,7 +109,7 @@ private:
       rotation += rotationSpeed * delta;
     }
 
-    void render(const render::gl::Texture &texture, const render::AspectRatio &deStretch) const {
+    void render(const render::Texture &texture, const render::AspectRatio &deStretch) const {
       render::color({pos.z, pos.z, pos.z});
       render::mat::push();
       render::mat::translate({
@@ -141,7 +140,7 @@ private:
     }
   }
 
-  void renderBricks(const render::gl::Texture &texture, const render::AspectRatio &deStretch) const {
+  void renderBricks(const render::Texture &texture, const render::AspectRatio &deStretch) const {
     for(const auto &brick: mBricks) {
       brick.render(texture, deStretch);
     }
@@ -315,7 +314,7 @@ private:
     }
   } mReviewManager;
 
-  render::gl::Texture mVignetteTexture;
+  render::Texture mVignetteTexture;
 
   Sound mConfirmation;
   Sound mMusic;
@@ -397,7 +396,7 @@ private:
     cSocialButtonTexUnit = 1.0f / cSocialButtonCount,
     cSocialButtonZ = cTextZ;
 
-  render::gl::Texture mSocialsTexture;
+  render::Texture mSocialsTexture;
 
   void renderSocialButton(s32 buttonNo) const {
     f32 buttonX = cSocialButtonX + f32(buttonNo) * cSocialButtonStride;
@@ -473,7 +472,7 @@ public:
     Button hover;
     switch(evt.type) {
     case Event::MouseMotion:
-      mHover = buttonAt(evt.motion);
+      mHover = buttonAt(evt.motion.to);
       break;
     case Event::MouseUp:
       hover = buttonAt(evt.click.pos);

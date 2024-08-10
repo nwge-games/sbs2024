@@ -2,8 +2,7 @@
 #include <nwge/bind.hpp>
 #include <nwge/data/bundle.hpp>
 #include <nwge/render/draw.hpp>
-#include <nwge/render/font.hpp>
-#include <nwge/render/gl/Texture.hpp>
+#include <nwge/render/Texture.hpp>
 #include <nwge/render/mat.hpp>
 #include <nwge/render/window.hpp>
 #include <random>
@@ -42,7 +41,7 @@ public:
     Button hover;
     switch(evt.type) {
     case Event::MouseMotion:
-      mHover = buttonAt(evt.motion);
+      mHover = buttonAt(evt.motion.to);
       break;
 
     case Event::MouseUp:
@@ -248,7 +247,7 @@ private:
     mFont.draw(name, {baseX + cButtonTextX, baseY + cButtonTextY, cTextZ}, cButtonTextH);
   }
 
-  render::gl::Texture mEMail;
+  render::Texture mEMail;
 
   static constexpr f32
     cLoreMailX = cInnerX + cInnerPad,
@@ -263,7 +262,7 @@ private:
       mEMail);
   }
 
-  render::gl::Texture mDevingTexture;
+  render::Texture mDevingTexture;
 
   static constexpr f32
     cDevingX = cInnerX + cInnerPad,
@@ -319,7 +318,7 @@ private:
     mFont.draw(cCredits, {cCreditsTextX, cCreditsTextY, cTextZ}, cButtonTextH);
   }
 
-  render::gl::Texture mRockTexture;
+  render::Texture mRockTexture;
 
   static constexpr f32
     cRockX = cInnerX + cInnerPad,
@@ -352,7 +351,7 @@ private:
   static constexpr glm::vec3
     cBrickColor{0.667f, 0.29f, 0.267f};
 
-  render::gl::Texture mBrickTexture;
+  render::Texture mBrickTexture;
 
   struct Brick {
     glm::vec3 pos;
@@ -396,7 +395,7 @@ private:
       rotation += rotationSpeed * delta;
     }
 
-    void render(const render::gl::Texture &texture) const {
+    void render(const render::Texture &texture) const {
       render::color({pos.z, pos.z, pos.z});
       render::mat::push();
       render::mat::translate({
@@ -427,7 +426,7 @@ private:
     }
   }
 
-  void renderBricks(const render::gl::Texture &texture) const {
+  void renderBricks(const render::Texture &texture) const {
     for(const auto &brick: mBricks) {
       brick.render(texture);
     }

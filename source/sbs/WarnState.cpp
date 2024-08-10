@@ -2,7 +2,6 @@
 #include "audio.hpp"
 #include <nwge/data/bundle.hpp>
 #include <nwge/render/draw.hpp>
-#include <nwge/render/font.hpp>
 #include <nwge/render/window.hpp>
 #include <nwge/time.hpp>
 #include <random>
@@ -17,7 +16,7 @@ private:
   render::Font mFont;
   Sound mBoom;
 
-  render::gl::Texture mLogoTexture;
+  render::Texture mLogoTexture;
 
   struct Warnings {
     String<> warning;

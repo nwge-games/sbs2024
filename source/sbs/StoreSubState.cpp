@@ -3,8 +3,8 @@
 #include "ui.hpp"
 #include <nwge/render/draw.hpp>
 #include <nwge/render/window.hpp>
-#include <nwge/render/font.hpp>
-#include <nwge/render/gl/Texture.hpp>
+#include <nwge/render/Font.hpp>
+#include <nwge/render/Texture.hpp>
 
 using namespace nwge;
 
@@ -138,7 +138,7 @@ private:
       swapStatePtr(getEndState());
       return;
     case sbs::StoreItem::None:
-      NWGE_ASSERT(false, "StoreItem::None");
+      NWGE_UNREACHABLE;
     }
     mPurchaseFloat = mItemHover;
     mItemHover = -1;
@@ -194,7 +194,7 @@ public:
       return true;
     }
     if(evt.type == Event::MouseMotion) {
-      updateItemHover(evt.motion);
+      updateItemHover(evt.motion.to);
     }
     if(evt.type == Event::MouseScroll) {
       mScroll = SDL_clamp(mScroll + evt.scroll, cMinScroll, cMaxScroll);
@@ -216,7 +216,7 @@ public:
     render::color(cBgColor);
     render::rect({0, 0, cBgZ}, {1, 1});
 
-    render::setScissorEnabled();
+    render::enableScissor();
     render::scissor({cItemAreaX, cItemAreaY}, {cItemAreaW, cItemAreaH});
 
     static constexpr usize cTextBufSz = 100;
@@ -277,14 +277,14 @@ public:
           cItemNameTextH);
       } else {
         int len = snprintf(textBuf.data(), cTextBufSz, "Price: %d", item.price);
-        drawTextWithShadow(mData.font, 
+        drawTextWithShadow(mData.font,
           {textBuf.data(), usize(len)},
           {cItemTextX, baseY + cPriceOff, cItemTextZ},
           cItemNameTextH);
       }
     }
 
-    render::setScissorEnabled(false);
+    render::disableScissor();
 
     render::color(cWindowBgColor);
     render::rect(

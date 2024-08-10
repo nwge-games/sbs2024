@@ -5,8 +5,8 @@ Functions for different states of the game.
 */
 
 #include <nwge/state.hpp>
-#include <nwge/render/font.hpp>
-#include <nwge/render/gl/Texture.hpp>
+#include <nwge/render/Font.hpp>
+#include <nwge/render/Texture.hpp>
 #include "audio.hpp"
 #include "config.hpp"
 #include "save.hpp"
@@ -14,7 +14,7 @@ Functions for different states of the game.
 namespace sbs {
 
 nwge::State *getWarningState();
-nwge::State *getIntroState(nwge::render::gl::Texture &&logoTexture, Sound &&music);
+nwge::State *getIntroState(nwge::render::Texture &&logoTexture, Sound &&music);
 nwge::State *getMenuState(Sound &&music);
 nwge::State *getExtrasState(Sound &&music);
 nwge::State *getShitState(Sound &&music);
@@ -28,7 +28,7 @@ struct StoreData {
   Sound &brokeSound;
 
   nwge::render::Font &font;
-  nwge::render::gl::Texture &icons;
+  nwge::render::Texture &icons;
 };
 
 nwge::SubState *getStoreSubState(StoreData data);

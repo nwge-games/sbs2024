@@ -11,7 +11,7 @@ namespace sbs {
 class EndState: public State {
 private:
   data::Bundle mBundle;
-  render::gl::Texture mTexture;
+  render::Texture mTexture;
   f32 mCountdown = 1.1f;
   Sound mSound;
 

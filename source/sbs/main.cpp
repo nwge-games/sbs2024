@@ -17,7 +17,7 @@ s32 main(s32 argc, CStr *argv) {
 
   sbs::initAudio();
   nwge::startPtr(statePtr, {
-    .appName = "Shitting Bricks Simulator 2024",
+    .appName = "Shitting Bricks Simulator 2024"_sv,
     .windowAspectRatio = {1, 1},
   });
   sbs::quitAudio();

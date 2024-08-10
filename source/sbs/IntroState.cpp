@@ -1,8 +1,8 @@
 #include "states.hpp"
 #include <nwge/data/bundle.hpp>
-#include <nwge/render/aspectRatio.hpp>
+#include <nwge/render/AspectRatio.hpp>
 #include <nwge/render/draw.hpp>
-#include <nwge/render/gl/Texture.hpp>
+#include <nwge/render/Texture.hpp>
 #include <nwge/render/window.hpp>
 
 using namespace nwge;
@@ -11,7 +11,7 @@ namespace sbs {
 
 class IntroState: public State {
 private:
-  render::gl::Texture mLogo;
+  render::Texture mLogo;
 
   f32 mFadeIn = 0.0f;
   f32 mLinger = 0.0f;
@@ -32,8 +32,8 @@ private:
   Sound mMusic;
 
 public:
-  IntroState(render::gl::Texture &&logoTexture, Sound &&music)
-    : mLogo(std::move(logoTexture)), mMusic(std::move(music)) 
+  IntroState(render::Texture &&logoTexture, Sound &&music)
+    : mLogo(std::move(logoTexture)), mMusic(std::move(music))
   {}
 
   bool init() override {
@@ -71,7 +71,7 @@ public:
   }
 };
 
-State *getIntroState(render::gl::Texture &&logoTexture, Sound &&music) {
+State *getIntroState(render::Texture &&logoTexture, Sound &&music) {
   return new IntroState(std::move(logoTexture), std::move(music));
 }
 

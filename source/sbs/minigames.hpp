@@ -7,7 +7,7 @@ Mini-game-related definitions
 */
 
 #include <nwge/state.hpp>
-#include <nwge/render/font.hpp>
+#include <nwge/render/Font.hpp>
 
 namespace sbs {
 

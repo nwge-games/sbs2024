@@ -7,7 +7,7 @@
 #include <nwge/data/bundle.hpp>
 #include <nwge/data/store.hpp>
 #include <nwge/render/draw.hpp>
-#include <nwge/render/gl/Texture.hpp>
+#include <nwge/render/Texture.hpp>
 #include <nwge/render/mat.hpp>
 #include <nwge/render/window.hpp>
 #include <boost/lexical_cast.hpp>
@@ -19,7 +19,7 @@ namespace sbs {
 class ShitState: public State {
 private:
   data::Bundle mBundle;
-  render::gl::Texture mBarsTexture;
+  render::Texture mBarsTexture;
 
   static constexpr f32
     cBarFillOff = 0.001f,
@@ -33,10 +33,10 @@ private:
     bool warning = false
   ) const {
     render::color(color);
-    render::setScissorEnabled();
+    render::enableScissor();
     render::scissor({pos.x, pos.y}, {size.x, size.y * progress});
     render::rect({pos.x, pos.y, pos.z - cBarFillOff}, size, mBarsTexture);
-    render::setScissorEnabled(false);
+    render::disableScissor();
 
     render::color(color * cBarBgClrMult);
     render::rect(pos, size);
@@ -120,7 +120,7 @@ private:
     mGravity = mConfig.gravity.base + f32(mSave.gravityTier) * mConfig.gravity.upgrade;
   }
 
-  render::gl::Texture mBrickTexture;
+  render::Texture mBrickTexture;
 
   f32 mBrickFall = -1.0f;
 
@@ -143,7 +143,7 @@ private:
     mScoreString = ScratchString::formatted("Score: {}", mSave.score);
   }
 
-  render::gl::Texture mWaterTexture;
+  render::Texture mWaterTexture;
 
   static constexpr f32
     cWaterW = 1,
@@ -158,7 +158,7 @@ private:
 
   static constexpr f32 cFadeInTime = 1.0f;
 
-  render::gl::Texture mBgTexture, mVignetteTexture;
+  render::Texture mBgTexture, mVignetteTexture;
 
   static constexpr f32
     cBgZ = 0.6f,
@@ -177,7 +177,7 @@ private:
     save();
   }
 
-  render::gl::Texture mIconsTexture;
+  render::Texture mIconsTexture;
 
   bool mHoveringStoreIcon = false;
 
@@ -274,7 +274,7 @@ private:
   Sound mPop;
   Sound mBreath;
 
-  render::gl::Texture mToiletTexture, mToiletFTexture;
+  render::Texture mToiletTexture, mToiletFTexture;
 
   void renderBrick() const {
     f32 brickY;
@@ -303,7 +303,7 @@ private:
       {mConfig.shitter.width, mConfig.shitter.height},
       mShitterTexture);
 
-    render::setScissorEnabled();
+    render::enableScissor();
     render::scissor(
       {mConfig.water.scissorX, mConfig.water.scissorY},
       {mConfig.water.scissorW, mConfig.water.scissorH});
@@ -312,7 +312,7 @@ private:
       {mWaterX, mWaterY, cWaterZ},
       {mConfig.water.width, mConfig.water.height},
       mWaterTexture);
-    render::setScissorEnabled(false);
+    render::disableScissor();
 
     render::color();
     render::rect(
@@ -342,7 +342,7 @@ private:
 
   Sound mMusic;
 
-  render::gl::Texture mShitterTexture;
+  render::Texture mShitterTexture;
 
 public:
   ShitState(Sound &&music)
@@ -410,7 +410,7 @@ public:
       }
     }
     if(evt.type == Event::MouseMotion) {
-      updateHoveringStoreIcon(evt.motion);
+      updateHoveringStoreIcon(evt.motion.to);
     }
     return true;
   }
