@@ -132,10 +132,10 @@ private:
 };
 
 s32 main([[maybe_unused]] s32 argc, [[maybe_unused]] CStr *argv) {
-  start<Void>({
+  start<Void>(config::Dev{
     .appName = "Brick Void",
     .userDefaults = {
-      .windowFullscreen = config::BooleanOverride::True
+      .windowState = config::WindowState::FullScreen,
     }
   });
   return 0;

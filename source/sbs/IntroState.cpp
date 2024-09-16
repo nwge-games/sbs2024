@@ -29,17 +29,15 @@ private:
   static constexpr glm::vec3 cLogoPos{cLogoOff, cLogoOff, cLogoZ};
   static constexpr glm::vec2 cLogoSize{cLogoSide, cLogoSide};
 
-  Sound mMusic;
+  Music mMusic;
 
 public:
-  IntroState(render::Texture &&logoTexture, Sound &&music)
+  IntroState(render::Texture &&logoTexture, Music &&music)
     : mLogo(std::move(logoTexture)), mMusic(std::move(music))
   {}
 
   bool init() override {
-    if(!mMusic.playing()) {
-      mMusic.play();
-    }
+    mMusic.play();
     return true;
   }
 
@@ -73,7 +71,7 @@ public:
   }
 };
 
-State *getIntroState(render::Texture &&logoTexture, Sound &&music) {
+State *getIntroState(render::Texture &&logoTexture, Music &&music) {
   return new IntroState(std::move(logoTexture), std::move(music));
 }
 

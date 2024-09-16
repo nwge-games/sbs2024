@@ -1,4 +1,3 @@
-#include "audio.hpp"
 #include "save.hpp"
 #include "version.h"
 #include "states.hpp"
@@ -316,8 +315,7 @@ private:
 
   render::Texture mVignetteTexture;
 
-  Sound mConfirmation;
-  Sound mMusic;
+  Music mMusic;
 
   enum Button {
     BNone = -1,
@@ -438,7 +436,7 @@ private:
   }};
 
 public:
-  MenuState(Sound &&music)
+  MenuState(Music &&music)
     : mMusic(std::move(music))
   {}
 
@@ -450,7 +448,6 @@ public:
       .nqFont("GrapeSoda.cfn", mFont)
       .nqCustom("reviews.json", mReviewManager)
       .nqTexture("vignette.png", mVignetteTexture)
-      .nqCustom("groovy.ogg", mMusic)
       .nqTexture("socials.png", mSocialsTexture)
       .nqCustom("cfg.json", mConfig);
     mStore.nqLoad("progress", mSave);
@@ -484,7 +481,6 @@ public:
       if(hover == BShit
       ||(hover == BExtras && mSave.prestige >= 1)) {
         mFadeOut = 0.0f;
-        mConfirmation.play();
         break;
       }
       break;
@@ -567,7 +563,7 @@ public:
   }
 };
 
-State *getMenuState(Sound &&music) {
+State *getMenuState(Music &&music) {
   return new MenuState(std::move(music));
 }
 

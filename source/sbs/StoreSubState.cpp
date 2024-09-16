@@ -110,7 +110,9 @@ private:
     if(hasItem(item)) {
       mPurchaseFloat = cAlreadyOwnedFloat;
       mPurchaseFloatTimer = 0.0f;
-      mData.brokeSound.play();
+      mData.source.stop();
+      mData.source.buffer(mData.brokeSound);
+      mData.source.play();
       return;
     }
 
@@ -118,7 +120,9 @@ private:
       // broke ahh
       mPurchaseFloat = cInsufficientFundsFloat;
       mPurchaseFloatTimer = 0.0f;
-      mData.brokeSound.play();
+      mData.source.stop();
+      mData.source.buffer(mData.brokeSound);
+      mData.source.play();
       return;
     }
 
@@ -138,11 +142,13 @@ private:
       swapStatePtr(getEndState());
       return;
     case sbs::StoreItem::None:
-      NWGE_UNREACHABLE;
+      NWGE_UNREACHABLE("Invalid StoreItem");
     }
     mPurchaseFloat = mItemHover;
     mItemHover = -1;
-    mData.buySound.play();
+    mData.source.stop();
+    mData.source.buffer(mData.buySound);
+    mData.source.play();
   }
 
   s32 mScroll = 0;

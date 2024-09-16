@@ -1,6 +1,7 @@
+#include "Music.hpp"
 #include "states.hpp"
-#include "audio.hpp"
 #include <nwge/data/bundle.hpp>
+#include <nwge/dialog.hpp>
 #include <nwge/render/draw.hpp>
 #include <nwge/render/window.hpp>
 #include <nwge/time.hpp>
@@ -14,7 +15,8 @@ class WarnState: public State {
 private:
   data::Bundle mBundle;
   render::Font mFont;
-  Sound mBoom;
+  audio::Source mBoomSource;
+  audio::Buffer mBoomBuffer;
 
   render::Texture mLogoTexture;
 
@@ -83,17 +85,24 @@ private:
     cContinueTextFadeInEnd = 6.0f,
     cFadeOutTime = 1.0f;
 
-  Sound mMusic;
+  Music mMusic;
 
 public:
   bool preload() override {
     mBundle
       .load({"sbs.bndl"})
       .nqFont("GrapeSoda.cfn", mFont)
-      .nqCustom("boom.ogg", mBoom)
+      .nqCustom("boom.wav", mBoomBuffer)
       .nqCustom("warnings.json", mWarnings)
-      .nqTexture("logo1.png", mLogoTexture)
-      .nqCustom("groovy.ogg", mMusic);
+      .nqTexture("logo1.png", mLogoTexture);
+    mBoomBuffer.label("boom buffer");
+    mBoomSource.label("boom source");
+    mMusic.nq(mBundle);
+    return true;
+  }
+
+  bool init() override {
+    mBoomSource.buffer(mBoomBuffer);
     return true;
   }
 
@@ -128,12 +137,12 @@ public:
 
     if(!mBigText && mTimer >= cBigTextTime) {
       mBigText = true;
-      mBoom.play();
+      mBoomSource.play();
     }
 
     if(!mSmallText && mTimer >= cSmallTextTime) {
       mSmallText = true;
-      mBoom.play();
+      mBoomSource.play();
     }
 
     return true;

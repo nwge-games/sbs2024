@@ -1,5 +1,9 @@
 # SBS2024 Changelog
 
+## v1.4
+
+* Updated to nwge v0.14
+
 ## v1.3
 
 * Updated to nwge v0.13

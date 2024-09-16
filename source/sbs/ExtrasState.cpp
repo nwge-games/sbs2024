@@ -13,7 +13,7 @@ namespace sbs {
 
 class ExtrasState: public State {
 public:
-  ExtrasState(Sound &&music)
+  ExtrasState(Music &&music)
     : mMusic(std::move(music))
   {}
 
@@ -134,7 +134,7 @@ public:
   }
 
 private:
-  Sound mMusic;
+  Music mMusic;
   data::Bundle mBundle;
   render::Font mFont;
   KeyBind mNext{"sbs.next", Key::Right, [this]{
@@ -433,7 +433,7 @@ private:
   }
 };
 
-State *getExtrasState(Sound &&music) {
+State *getExtrasState(Music &&music) {
   return new ExtrasState(std::move(music));
 }
 

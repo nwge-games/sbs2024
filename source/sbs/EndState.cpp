@@ -2,6 +2,7 @@
 #include "states.hpp"
 #include <nwge/data/bundle.hpp>
 #include <nwge/data/store.hpp>
+#include <nwge/dialog.hpp>
 #include <nwge/render/draw.hpp>
 
 using namespace nwge;
@@ -13,7 +14,8 @@ private:
   data::Bundle mBundle;
   render::Texture mTexture;
   f32 mCountdown = 1.1f;
-  Sound mSound;
+  audio::Source mSource;
+  audio::Buffer mSound;
 
   data::Store mStore;
   Savefile mSave{};
@@ -23,7 +25,7 @@ public:
     mBundle
       .load({"sbs.bndl"})
       .nqTexture("michael.png", mTexture)
-      .nqCustom("michael.ogg", mSound);
+      .nqCustom("michael.wav", mSound);
     mStore.nqLoad("progress", mSave);
     return true;
   }
@@ -33,7 +35,7 @@ public:
     mSave = {};
     mSave.prestige = prestige;
     mStore.nqSave("progress", mSave);
-    mSound.play();
+    mSource.enqueue(mSound);
     return true;
   }
 

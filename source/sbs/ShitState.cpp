@@ -1,5 +1,4 @@
 #include "states.hpp"
-#include "audio.hpp"
 #include "save.hpp"
 #include "ui.hpp"
 #include <cmath>
@@ -268,11 +267,19 @@ private:
   f32 mWaterX = 0.0f;
   f32 mWaterY = 0.0f;
 
-  Sound mSplash;
-  Sound mBuy;
-  Sound mBrokeAssMfGetAJob;
-  Sound mPop;
-  Sound mBreath;
+  audio::Source mBreathSource;
+  audio::Buffer mBreath;
+
+  audio::Source mSfxSource;
+  audio::Buffer mSplash;
+  audio::Buffer mBuy;
+  audio::Buffer mBrokeAssMfGetAJob;
+  audio::Buffer mPop;
+  inline void play(audio::Buffer &sound) {
+    mSfxSource.stop();
+    mSfxSource.buffer(sound);
+    mSfxSource.play();
+  }
 
   render::Texture mToiletTexture, mToiletFTexture;
 
@@ -340,12 +347,12 @@ private:
     render::color();
   }
 
-  Sound mMusic;
+  Music mMusic;
 
   render::Texture mShitterTexture;
 
 public:
-  ShitState(Sound &&music)
+  ShitState(Music &&music)
     : mMusic(std::move(music))
   {}
 
@@ -360,11 +367,11 @@ public:
       .nqCustom("cfg.json", mConfig)
       .nqTexture("vignette.png", mVignetteTexture)
       .nqTexture("icons.png", mIconsTexture)
-      .nqCustom("splash.ogg", mSplash)
-      .nqCustom("buy.ogg", mBuy)
-      .nqCustom("broke.ogg", mBrokeAssMfGetAJob)
-      .nqCustom("pop.ogg", mPop)
-      .nqCustom("breath.ogg", mBreath)
+      .nqCustom("splash.wav", mSplash)
+      .nqCustom("buy.wav", mBuy)
+      .nqCustom("broke.wav", mBrokeAssMfGetAJob)
+      .nqCustom("pop.wav", mPop)
+      .nqCustom("breath.wav", mBreath)
       .nqTexture("toilet.png", mToiletTexture)
       .nqTexture("toiletF.png", mToiletFTexture)
       .nqTexture("shitter.png", mShitterTexture);
@@ -373,6 +380,7 @@ public:
   }
 
   bool init() override {
+    mBreathSource.buffer(mBreath);
     recalculateProgressDecay();
     recalculateGravity();
     refreshScoreString();
@@ -390,6 +398,7 @@ public:
         StoreData data{
           mSave,
           mConfig,
+          mSfxSource,
           mBuy,
           mBrokeAssMfGetAJob,
           mFont,
@@ -453,7 +462,7 @@ public:
     mOxy -= mEffort * mConfig.oxy.drain * delta;
     if(mOxy <= 0) {
       if(!mOuttaBreath) {
-        mBreath.play();
+        mBreathSource.play();
       }
       mOuttaBreath = true;
       mOxy = 0;
@@ -467,7 +476,7 @@ public:
       if(mProgress >= 1) {
         mCooldown = 1.0f;
         mBrickFall = 0.0f;
-        mPop.play();
+        play(mPop);
         ++mSave.score;
         save();
       } else if(mProgress > 0) {
@@ -490,7 +499,7 @@ public:
     if(mBrickFall >= 0) {
       mBrickFall += mConfig.brick.fallSpeed * delta;
       if(mBrickFall >= mWaterY && sSplash) {
-        mSplash.play();
+        play(mSplash);
         sSplash = false;
       }
     }
@@ -535,7 +544,7 @@ public:
   }
 };
 
-State *getShitState(Sound &&music) {
+State *getShitState(Music &&music) {
   return new ShitState(std::move(music));
 }
 

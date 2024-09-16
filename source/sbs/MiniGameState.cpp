@@ -116,10 +116,10 @@ private:
   void returnFromMiniGame() {
     switch(mReturnTo) {
     case MiniGame::ReturnToMenu:
-      swapStatePtr(getMenuState(Sound{}));
+      swapStatePtr(getMenuState(Music{}));
       break;
     case MiniGame::ReturnToGame:
-      swapStatePtr(getShitState(Sound{}));
+      swapStatePtr(getShitState(Music{}));
       break;
     }
   }
