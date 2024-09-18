@@ -3,6 +3,8 @@
 ## v1.4
 
 * Updated to nwge v0.14
+* Added new warning labels & reviews
+* Added an easter egg
 
 ## v1.3
 
