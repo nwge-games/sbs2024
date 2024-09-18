@@ -10,6 +10,7 @@
 #include <nwge/render/mat.hpp>
 #include <nwge/render/window.hpp>
 #include <boost/lexical_cast.hpp>
+#include <random>
 
 using namespace nwge;
 
@@ -161,6 +162,7 @@ private:
 
   static constexpr f32
     cBgZ = 0.6f,
+    cPRZ = 0.415f,
     cVignetteZ = 0.41f,
     cFadeZ = 0.405f;
 
@@ -351,6 +353,18 @@ private:
 
   render::Texture mShitterTexture;
 
+  render::Texture mPRTexture;
+
+  std::mt19937 mRng;
+  static constexpr s32 cPRRoll = 100000;  /* maximum number randomly rolled */
+  static constexpr s32 cPRTarget = 1010;  /* the number rolled for event */
+  std::uniform_int_distribution<s32> mPRDist{-cPRRoll, cPRRoll};
+  static constexpr s32 cPRW = 2;
+  static constexpr s32 cPRH = 2;
+  std::uniform_int_distribution<s32> mPRImgDist{0, cPRW*cPRH - 1};
+
+  s32 mPRImg = 0;
+
 public:
   ShitState(Music &&music)
     : mMusic(std::move(music))
@@ -374,7 +388,8 @@ public:
       .nqCustom("breath.wav", mBreath)
       .nqTexture("toilet.png", mToiletTexture)
       .nqTexture("toiletF.png", mToiletFTexture)
-      .nqTexture("shitter.png", mShitterTexture);
+      .nqTexture("shitter.png", mShitterTexture)
+      .nqTexture("PR.JPG"_sv, mPRTexture);
     mStore.nqLoad("progress", mSave);
     return true;
   }
@@ -432,8 +447,16 @@ public:
     static bool sSplash = true;
 
     mTimer += delta;
-    mWaterX = mConfig.water.minX - (0.5f*sinf(1+1.2*mTimer) + 1) * (mConfig.water.maxX - mConfig.water.minX); 
-    mWaterY = mConfig.water.minY + (0.5f*sinf(mTimer) + 1) * (mConfig.water.maxY - mConfig.water.minY); 
+    mWaterX = mConfig.water.minX - (0.5f*sinf(1+1.2*mTimer) + 1) * (mConfig.water.maxX - mConfig.water.minX);
+    mWaterY = mConfig.water.minY + (0.5f*sinf(mTimer) + 1) * (mConfig.water.maxY - mConfig.water.minY);
+    if(mPRImg > 0) {
+      mPRImg = -1;
+    } else {
+      s32 roll = mPRDist(mRng);
+      if(roll == cPRTarget) {
+        mPRImg = mPRImgDist(mRng);
+      }
+    }
 
     if(mTimer < cFadeInTime) {
       return true;
@@ -510,7 +533,6 @@ public:
     render::color();
     render::rect({0, 0, cBgZ}, {1, 1}, mBgTexture);
 
-
     if(mCooldown <= 0 || mBrickFall >= 0) {
       renderBrick();
     }
@@ -532,6 +554,18 @@ public:
       {
         {cStoreIconTexX, cStoreIconTexY},
         {cStoreIconTexW, cStoreIconTexH}});
+
+    if(mPRImg > 0) {
+      render::color();
+      f32 uvX = f32(mPRImg % cPRW) / f32(cPRW);
+      f32 uvY = f32(s32(mPRImg / cPRW)) / f32(cPRH);
+      render::rect(
+        {0, 0, cPRZ},
+        {1, 1},
+        mPRTexture, {
+          {uvX, uvY},
+          {1.0f/cPRW, 1.0f/cPRH}});
+    }
 
     f32 vignetteAlpha = fmaxf(mEffort, 1.0f - mOxy);
     render::color({1, 1, 1, vignetteAlpha});
