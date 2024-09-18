@@ -113,11 +113,11 @@ private:
   f32 mProgressDecay = 0.9f;
 
   void recalculateProgressDecay() {
-    mProgressDecay = mConfig.lube.base - f32(mSave.lubeTier) * mConfig.lube.upgrade;
+    mProgressDecay = mConfig.lube.base - f32(mSave.v2.lubeTier) * mConfig.lube.upgrade;
   }
 
   void recalculateGravity() {
-    mGravity = mConfig.gravity.base + f32(mSave.gravityTier) * mConfig.gravity.upgrade;
+    mGravity = mConfig.gravity.base + f32(mSave.v2.gravityTier) * mConfig.gravity.upgrade;
   }
 
   render::Texture mBrickTexture;
@@ -140,7 +140,7 @@ private:
   ScratchString mScoreString;
 
   void refreshScoreString() {
-    mScoreString = ScratchString::formatted("Score: {}", mSave.score);
+    mScoreString = ScratchString::formatted("Score: {}", mSave.v2.score);
   }
 
   render::Texture mWaterTexture;
@@ -169,7 +169,7 @@ private:
   data::Store mStore;
 
   void save() {
-    mStore.nqSave("progress", mSave);
+    mStore.nqSave("save.json", mSave);
     refreshScoreString();
   }
 
@@ -208,12 +208,12 @@ private:
 
   console::Command mLubeCommand{"sbs.lube", [this](auto &args){
     if(args.size() == 0) {
-      console::print("lube tier: {}", mSave.lubeTier);
+      console::print("lube tier: {}", mSave.v2.lubeTier);
     }
     if(args.size() == 1) {
       try {
-        mSave.lubeTier = boost::lexical_cast<s16>(args[0].begin(), args[0].size());
-        console::print("lube tier: {}", mSave.lubeTier);
+        mSave.v2.lubeTier = boost::lexical_cast<s16>(args[0].begin(), args[0].size());
+        console::print("lube tier: {}", mSave.v2.lubeTier);
       } catch(boost::bad_lexical_cast &e) {
         console::error("bad numeric literal: {}", args[0]);
       }
@@ -222,12 +222,12 @@ private:
 
   console::Command mGravityCommand{"sbs.gravity", [this](auto &args){
     if(args.size() == 0) {
-      console::print("gravity tier: {}", mSave.gravityTier);
+      console::print("gravity tier: {}", mSave.v2.gravityTier);
     }
     if(args.size() == 1) {
       try {
-        mSave.gravityTier = boost::lexical_cast<s16>(args[0].begin(), args[0].size());
-        console::print("gravity tier: {}", mSave.gravityTier);
+        mSave.v2.gravityTier = boost::lexical_cast<s16>(args[0].begin(), args[0].size());
+        console::print("gravity tier: {}", mSave.v2.gravityTier);
       } catch(boost::bad_lexical_cast &e) {
         console::error("bad numeric literal: {}", args[0]);
       }
@@ -236,12 +236,12 @@ private:
 
   console::Command mScoreCommand{"sbs.score", [this](auto &args){
     if(args.size() == 0) {
-      console::print("score: {}", mSave.score);
+      console::print("score: {}", mSave.v2.score);
     }
     if(args.size() == 1) {
       try {
-        mSave.score = boost::lexical_cast<s16>(args[0].begin(), args[0].size());
-        console::print("score: {}", mSave.score);
+        mSave.v2.score = boost::lexical_cast<s16>(args[0].begin(), args[0].size());
+        console::print("score: {}", mSave.v2.score);
       } catch(boost::bad_lexical_cast &e) {
         console::error("bad numeric literal: {}", args[0]);
       }
@@ -250,12 +250,12 @@ private:
 
   console::Command mOxyCommand{"sbs.oxyTier", [this](auto &args){
     if(args.size() == 0) {
-      console::print("oxyTier: {}", mSave.oxyTier);
+      console::print("oxyTier: {}", mSave.v2.oxyTier);
     }
     if(args.size() == 1) {
       try {
-        mSave.oxyTier = boost::lexical_cast<s16>(args[0].begin(), args[0].size());
-        console::print("oxyTier: {}", mSave.oxyTier);
+        mSave.v2.oxyTier = boost::lexical_cast<s16>(args[0].begin(), args[0].size());
+        console::print("oxyTier: {}", mSave.v2.oxyTier);
       } catch(boost::bad_lexical_cast &e) {
         console::error("bad numeric literal: {}", args[0]);
       }
@@ -390,7 +390,8 @@ public:
       .nqTexture("toiletF.png", mToiletFTexture)
       .nqTexture("shitter.png", mShitterTexture)
       .nqTexture("PR.JPG"_sv, mPRTexture);
-    mStore.nqLoad("progress", mSave);
+    mStore.nqLoad("progress", mSave.v1);
+    mStore.nqLoad("save.json", mSave.v2);
     return true;
   }
 
@@ -400,6 +401,9 @@ public:
     recalculateGravity();
     refreshScoreString();
     save();
+    if(mSave.v1.loaded) {
+      mStore.nqDelete("progress"_sv);
+    }
     return true;
   }
 
@@ -474,7 +478,7 @@ public:
 
     if(mOxy < 1.0f) {
       f32 regen = mConfig.oxy.regenFast;
-      if(mOuttaBreath && mSave.oxyTier < 1) {
+      if(mOuttaBreath && mSave.v2.oxyTier < 1) {
         regen = mConfig.oxy.regenSlow;
       }
       mOxy += regen * delta;
@@ -500,7 +504,7 @@ public:
         mCooldown = 1.0f;
         mBrickFall = 0.0f;
         play(mPop);
-        ++mSave.score;
+        ++mSave.v2.score;
         save();
       } else if(mProgress > 0) {
         mProgress -= mProgressDecay * delta;

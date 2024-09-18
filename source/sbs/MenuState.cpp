@@ -450,14 +450,18 @@ public:
       .nqTexture("vignette.png", mVignetteTexture)
       .nqTexture("socials.png", mSocialsTexture)
       .nqCustom("cfg.json", mConfig);
-    mStore.nqLoad("progress", mSave);
+    mStore.nqLoad("progress", mSave.v1);
+    mStore.nqLoad("save.json", mSave.v2);
     return true;
   }
 
   bool init() override {
     populateBricks();
     mReviewManager.populateInstances();
-    mStore.nqSave("progress", mSave);
+    mStore.nqSave("save.json", mSave);
+    if(mSave.v1.loaded) {
+      mStore.nqDelete("progress"_sv);
+    }
     return true;
   }
 
@@ -479,7 +483,7 @@ public:
       }
       mHover = mSelection = hover;
       if(hover == BShit
-      ||(hover == BExtras && mSave.prestige >= 1)) {
+      ||(hover == BExtras && mSave.v2.prestige >= 1)) {
         mFadeOut = 0.0f;
         break;
       }
@@ -531,7 +535,7 @@ public:
     mReviewManager.renderInstances(mFont);
 
     renderButton("Shit", BShit);
-    if(mSave.prestige >= 1) {
+    if(mSave.v2.prestige >= 1) {
       renderButton("Extras", BExtras);
     }
 

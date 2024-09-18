@@ -26,15 +26,15 @@ public:
       .load({"sbs.bndl"})
       .nqTexture("michael.png", mTexture)
       .nqCustom("michael.wav", mSound);
-    mStore.nqLoad("progress", mSave);
+    mStore.nqLoad("save.json", mSave.v2);
     return true;
   }
 
   bool init() override {
-    auto prestige = s16(mSave.prestige + 1);
+    auto prestige = s16(mSave.v2.prestige + 1);
     mSave = {};
-    mSave.prestige = prestige;
-    mStore.nqSave("progress", mSave);
+    mSave.v2.prestige = prestige;
+    mStore.nqSave("save.json", mSave);
     mSource.enqueue(mSound);
     return true;
   }
@@ -42,7 +42,7 @@ public:
   bool tick(f32 delta) override {
     mCountdown -= delta;
     if(mCountdown <= 0) {
-      if(mSave.prestige == 1) {
+      if(mSave.v2.prestige == 1) {
         dialog::info("Notification", "Something new has appeared in the store...");
       }
       return false;

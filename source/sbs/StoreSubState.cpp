@@ -16,16 +16,16 @@ private:
 
   [[nodiscard]]
   bool hasItem(const StoreItem &item) const {
-    if(mData.save.prestige < item.prestige) {
+    if(mData.save.v2.prestige < item.prestige) {
       return false;
     }
     switch(item.kind) {
     case sbs::StoreItem::Lube:
-      return mData.save.lubeTier >= item.argument;
+      return mData.save.v2.lubeTier >= item.argument;
     case sbs::StoreItem::Gravity:
-      return mData.save.gravityTier >= item.argument;
+      return mData.save.v2.gravityTier >= item.argument;
     case sbs::StoreItem::Oxy:
-      return mData.save.oxyTier >= item.argument;
+      return mData.save.v2.oxyTier >= item.argument;
     default:
       return false;
     }
@@ -116,7 +116,7 @@ private:
       return;
     }
 
-    if(mData.save.score < item.price) {
+    if(mData.save.v2.score < item.price) {
       // broke ahh
       mPurchaseFloat = cInsufficientFundsFloat;
       mPurchaseFloatTimer = 0.0f;
@@ -126,17 +126,17 @@ private:
       return;
     }
 
-    mData.save.score -= item.price;
+    mData.save.v2.score -= item.price;
     mData.save.dirty = true;
     switch(item.kind) {
     case sbs::StoreItem::Lube:
-      mData.save.lubeTier = SDL_max(mData.save.lubeTier, item.argument);
+      mData.save.v2.lubeTier = SDL_max(mData.save.v2.lubeTier, item.argument);
       break;
     case sbs::StoreItem::Gravity:
-      mData.save.gravityTier = SDL_max(mData.save.gravityTier, item.argument);
+      mData.save.v2.gravityTier = SDL_max(mData.save.v2.gravityTier, item.argument);
       break;
     case sbs::StoreItem::Oxy:
-      mData.save.oxyTier = SDL_max(mData.save.oxyTier, item.argument);
+      mData.save.v2.oxyTier = SDL_max(mData.save.v2.oxyTier, item.argument);
       break;
     case sbs::StoreItem::EndGame:
       swapStatePtr(getEndState());
@@ -164,7 +164,7 @@ private:
     }
     s32 displayIdx = 0;
     for(const auto &item: mData.config.store) {
-      if(item.prestige > mData.save.prestige) {
+      if(item.prestige > mData.save.v2.prestige) {
         continue;
       }
       if(displayIdx++ == mItemHover) {
@@ -230,7 +230,7 @@ public:
     s32 displayIdx = 0;
     for(usize i = 0; i < mData.config.store.size(); ++i) {
       const auto &item = mData.config.store[i];
-      if(item.prestige > mData.save.prestige) {
+      if(item.prestige > mData.save.v2.prestige) {
         continue;
       }
       owned = hasItem(item);
