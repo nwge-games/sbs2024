@@ -5,6 +5,7 @@
 * Updated to nwge v0.14
 * Added new warning labels & reviews
 * Added an easter egg
+* Updated the Credits tab in the Extras menu
 
 ## v1.3
 

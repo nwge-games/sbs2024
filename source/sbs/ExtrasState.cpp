@@ -20,11 +20,12 @@ public:
   bool preload() override {
     mBundle
       .load({"sbs.bndl"})
-      .nqFont("GrapeSoda.cfn", mFont)
-      .nqTexture("email.png", mEMail)
-      .nqTexture("deving.png", mDevingTexture)
-      .nqTexture("rock.png", mRockTexture)
-      .nqTexture("brick.png", mBrickTexture);
+      .nqFont("GrapeSoda.cfn"_sv, mFont)
+      .nqTexture("email.png"_sv, mEMail)
+      .nqTexture("deving.png"_sv, mDevingTexture)
+      .nqTexture("rock.png"_sv, mRockTexture)
+      .nqTexture("brick.png"_sv, mBrickTexture)
+      .nqCustom("credits.txt"_sv, mCredits);
     return true;
   }
 
@@ -291,31 +292,14 @@ private:
       cButtonTextH);
   }
 
-  static constexpr f32
-    cCreditsTextX = cInnerX + 0.05f,
-    cCreditsTextY = cInnerY + 0.05f;
+  static constexpr f32 cCreditsTextX = cInnerX + 0.05f;
 
-  static constexpr StringView cCredits =
-    "Programming:\n"
-    "  qeaml\n"
-    "\n"
-    "Art:\n"
-    "  qeaml\n"
-    "  domi9\n"
-    "\n"
-    "Music:\n"
-    "  qeaml\n"
-    "\n"
-    "Sound effects:\n"
-    "  domi9\n"
-    "\n"
-    "Special thanks:\n"
-    "  clueless\n"
-    "  BatEmpire\n"
-    "  Gillbert";
+  String<> mCredits;
 
   void renderCreditsTab() const {
-    mFont.draw(cCredits, {cCreditsTextX, cCreditsTextY, cTextZ}, cButtonTextH);
+    glm::vec2 measure = mFont.measure(mCredits, cButtonTextH);
+    f32 textY = cInnerY + (cInnerH - measure.y)/2.0f;
+    mFont.draw(mCredits, {cCreditsTextX, textY, cTextZ}, cButtonTextH);
   }
 
   render::Texture mRockTexture;

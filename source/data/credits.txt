@@ -1,0 +1,19 @@
+Programming:
+  qeaml
+
+Art:
+  qeaml
+  domi9
+
+Music:
+  qeaml
+
+Sound effects:
+  domi9
+
+Special thanks:
+  Nikki for the $5
+  Igor
+  clueless
+  BatEmpire
+  Gillbert
