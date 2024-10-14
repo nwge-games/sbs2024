@@ -5,6 +5,14 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "type": "cppvsdbg",
+      "request": "launch",
+      "name": "Debug (VS)",
+      "program": "${workspaceFolder}/target/debug/sbs",
+      "args": ["-intro"],
+      "cwd": "${workspaceFolder}/target"
+    },
+    {
       "type": "lldb",
       "request": "launch",
       "name": "Debug",
