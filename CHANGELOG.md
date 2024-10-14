@@ -7,6 +7,11 @@
 * Added an easter egg
 * Updated the Credits tab in the Extras menu
 
+There is a small issue where running certain console commands causes the game
+to crash. This is also inconsistent and rarely runs the command without
+crashing. So long as you don't run any console commands (which you
+realistically won't ever have to) you'll be fine.
+
 ## v1.3
 
 * Updated to nwge v0.13
