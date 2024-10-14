@@ -18,6 +18,7 @@ s32 main(s32 argc, CStr *argv) {
     .appName = "Shitting Bricks Simulator 2024"_sv,
     .windowResizable = false,
     .windowAspectRatio = {1, 1},
+    .filterFonts = false,
   });
   return 0;
 }
