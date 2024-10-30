@@ -10,6 +10,8 @@ s32 main(s32 argc, CStr *argv) {
     statePtr = sbs::getShitState({});
   } else if(nwge::cli::flag("menu")) {
     statePtr = sbs::getMenuState({});
+  } else if(nwge::cli::flag("end")) {
+    statePtr = sbs::getEndState();
   } else {
     statePtr = sbs::getWarningState();
   }

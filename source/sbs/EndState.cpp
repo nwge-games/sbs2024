@@ -12,8 +12,8 @@ namespace sbs {
 class EndState: public State {
 private:
   data::Bundle mBundle;
-  render::Texture mTexture;
-  f32 mCountdown = 1.1f;
+  render::AnimatedTexture mTexture;
+  f32 mCountdown = 11.91f;
   audio::Source mSource;
   audio::Buffer mSound;
 
@@ -24,7 +24,7 @@ public:
   bool preload() override {
     mBundle
       .load({"sbs.bndl"})
-      .nqTexture("michael.png", mTexture)
+      .nqCustom("michael.gif", mTexture)
       .nqCustom("michael.wav", mSound);
     mStore.nqLoad("save.json", mSave.v2);
     return true;
@@ -35,7 +35,13 @@ public:
     mSave = {};
     mSave.v2.prestige = prestige;
     mStore.nqSave("save.json", mSave);
-    mSource.enqueue(mSound);
+    mSource.buffer(mSound);
+    mSource.play();
+    // nwge starts playing the animation immediately, so we have to stop it
+    // first to reset back to the first frame and then start it again to ensure
+    // it's in sync with audio
+    mTexture.stop();
+    mTexture.play();
     return true;
   }
 
