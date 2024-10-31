@@ -93,6 +93,7 @@ bool SavefileV2::save(data::RW &file) const {
 }
 
 bool Savefile::save(data::RW &file) {
+  dirty = false;
   if(v1.loaded) {
     v2.score = v1.score;
     v2.lubeTier = v1.lubeTier;

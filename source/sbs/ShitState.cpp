@@ -356,7 +356,7 @@ private:
   render::Texture mPRTexture;
 
   std::mt19937 mRng;
-  static constexpr s32 cPRRoll = 100000;  /* maximum number randomly rolled */
+  static constexpr s32 cPRRoll = 10000;   /* maximum number randomly rolled */
   static constexpr s32 cPRTarget = 1010;  /* the number rolled for event */
   std::uniform_int_distribution<s32> mPRDist{-cPRRoll, cPRRoll};
   static constexpr s32 cPRW = 2;
