@@ -17,7 +17,7 @@
       "request": "launch",
       "name": "Debug",
       "program": "${workspaceFolder}/target/debug/sbs",
-      "args": ["-end"],
+      "args": ["-menu"],
       "cwd": "${workspaceFolder}/target"
     }
   ]

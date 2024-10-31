@@ -21,8 +21,8 @@ namespace sbs {
 
 class MenuState: public State {
 private:
-  data::Bundle mBundle;
-  render::Texture mLogo;
+  data::Bundle mBundle{"sbs"_sv};
+  render::AnimatedTexture mLogo;
 
   f32 mFadeIn = 0.0f;
   f32 mFadeOut = -1.0f;
@@ -34,10 +34,10 @@ private:
 
   render::AspectRatio m1x1{1, 1};
   static constexpr f32
-    cLogoW = 0.8f,
-    cLogoH = (360.0f/1200.f) * cLogoW,
+    cLogoW = 0.95f,
+    cLogoH = (106.f/1012.f) * cLogoW,
     cLogoX = (1.0f - cLogoW) / 2.0f,
-    cLogoY = 0.1f,
+    cLogoY = 0.25f,
     cLogoZ = 0.5f,
     cButtonTextZ = 0.4f;
   static constexpr glm::vec3 cLogoPos{cLogoX, cLogoY, cLogoZ};
@@ -442,16 +442,15 @@ public:
 
   bool preload() override {
     mBundle
-      .load({"sbs.bndl"})
-      .nqTexture("logo2.png", mLogo)
-      .nqTexture("brick.png", mBrickTexture)
-      .nqFont("GrapeSoda.cfn", mFont)
-      .nqCustom("reviews.json", mReviewManager)
-      .nqTexture("vignette.png", mVignetteTexture)
-      .nqTexture("socials.png", mSocialsTexture)
-      .nqCustom("cfg.json", mConfig);
-    mStore.nqLoad("progress", mSave.v1);
-    mStore.nqLoad("save.json", mSave.v2);
+      .nqCustom("sbs2024.gif"_sv, mLogo)
+      .nqTexture("brick.png"_sv, mBrickTexture)
+      .nqFont("GrapeSoda.cfn"_sv, mFont)
+      .nqCustom("reviews.json"_sv, mReviewManager)
+      .nqTexture("vignette.png"_sv, mVignetteTexture)
+      .nqTexture("socials.png"_sv, mSocialsTexture)
+      .nqCustom("cfg.json"_sv, mConfig);
+    mStore.nqLoad("progress"_sv, mSave.v1);
+    mStore.nqLoad("save.json"_sv, mSave.v2);
     return true;
   }
 

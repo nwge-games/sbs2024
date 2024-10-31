@@ -3,6 +3,7 @@
 ## v1.5
 
 * Updated the ending
+* Updated the main menu logo
 
 ## v1.4
 
