@@ -2,6 +2,7 @@
 #include "states.hpp"
 #include <nwge/data/bundle.hpp>
 #include <nwge/dialog.hpp>
+#include <nwge/json.hpp>
 #include <nwge/render/draw.hpp>
 #include <nwge/render/window.hpp>
 #include <nwge/time.hpp>

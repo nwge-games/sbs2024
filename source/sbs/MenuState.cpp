@@ -7,6 +7,7 @@
 #include <nwge/data/bundle.hpp>
 #include <nwge/data/store.hpp>
 #include <nwge/dialog.hpp>
+#include <nwge/json.hpp>
 #include <nwge/render/AspectRatio.hpp>
 #include <nwge/render/draw.hpp>
 #include <nwge/render/Texture.hpp>
